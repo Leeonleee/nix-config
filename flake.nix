@@ -47,5 +47,27 @@
         }
       ];
     };
+
+    nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+
+      modules = [
+        ./hosts/desktop/configuration.nix
+
+        home-manager.nixosModules.home-manager
+        stylix.nixosModules.stylix
+
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+
+          home-manager.extraSpecialArgs = {
+            inherit inputs;
+          };
+
+          home-manager.users.leonl = import ./home/leonl/home.nix;
+        }
+      ];
+    };
   };
 }
