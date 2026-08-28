@@ -5,9 +5,14 @@ let
   };
 in
 {
-  home.packages = [
-    unstable.herdr
+
+  imports = [
+    "${inputs.home-manager-unstable}/modules/programs/herdr.nix"
   ];
+  programs.herdr = {
+    enable = true;
+    package = unstable.herdr;
+  };
 
   xdg.configFile."herdr/config.toml".source = ./config.toml;
 }
