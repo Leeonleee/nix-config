@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    nixpkgs-unstable.utl = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
@@ -16,7 +16,7 @@
     };
   };
 
-  outputs = {
+  outputs = inputs@{
     nixpkgs,
     home-manager,
     stylix,
@@ -34,6 +34,10 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+          
+          home-manager.extraSpecialArgs = {
+            inherit inputs;
+          };
 
           home-manager.users.leonl = import ./home/leonl/home.nix;
         }

@@ -8,6 +8,7 @@
     ./programs/kitty/kitty.nix
     ./programs/starship/starship.nix
     ./programs/eza/eza.nix
+    ./programs/herdr/herdr.nix
   ];
 
   home.username = "leonl";
