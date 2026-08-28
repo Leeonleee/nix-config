@@ -9,6 +9,7 @@
     ./programs/starship/starship.nix
     ./programs/eza/eza.nix
     ./programs/herdr/herdr.nix
+    ./programs/pi/pi.nix
   ];
 
   home.username = "leonl";
