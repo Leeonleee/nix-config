@@ -38,5 +38,7 @@
     enable = true;
   };
 
+  programs.vesktop.enable = true;
+
   programs.home-manager.enable = true;
 }
