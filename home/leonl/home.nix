@@ -5,6 +5,7 @@
     ./programs/zsh.nix
     ./programs/fastfetch.nix
     ./programs/neovim.nix
+    ./programs/kitty.nix
   ];
 
   home.username = "leonl";
