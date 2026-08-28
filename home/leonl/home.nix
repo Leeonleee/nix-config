@@ -2,10 +2,10 @@
 
 {
   imports = [
-    ./programs/zsh.nix
-    ./programs/fastfetch.nix
+    ./programs/zsh/zsh.nix
+    ./programs/fastfetch/fastfetch.nix
     ./programs/neovim/neovim.nix
-    ./programs/kitty.nix
+    ./programs/kitty/kitty.nix
   ];
 
   home.username = "leonl";
