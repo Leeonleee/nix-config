@@ -4,7 +4,7 @@
   imports = [
     ./programs/zsh.nix
     ./programs/fastfetch.nix
-    ./programs/neovim.nix
+    ./programs/neovim/neovim.nix
     ./programs/kitty.nix
   ];
 
@@ -16,7 +16,6 @@
   home.packages = with pkgs; [
     bitwarden-desktop
     google-chrome
-    wl-clipboard
   ];
 
   programs.git = {
