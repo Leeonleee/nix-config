@@ -23,7 +23,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
 
-          home-manager.users.leonl = import ./home/leon.nix;
+          home-manager.users.leonl = import ./home/leonl/home.nix;
         }
       ];
     };
