@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./programs/zsh.nix
+  ];
+
   home.username = "leonl";
   home.homeDirectory = "/home/leonl";
 
@@ -21,14 +25,6 @@
       };
 
       init.defaultBranch = "main";
-    };
-  };
-
-  programs.zsh = {
-    enable = true;
-
-    shellAliases = {
-      rebuild = "sudo nixos-rebuild switch --flake ~/nix-config#framework";
     };
   };
 
