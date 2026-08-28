@@ -7,6 +7,7 @@
     ./programs/neovim/neovim.nix
     ./programs/kitty/kitty.nix
     ./programs/starship/starship.nix
+    ./programs/eza/eza.nix
   ];
 
   home.username = "leonl";
@@ -19,11 +20,6 @@
     google-chrome
   ];
 
-  stylix.targets = {
-    kitty.enable = true;
-    neovim.enable = true;
-  };
-
   stylix.opacity = {
     terminal = 0.9;
   };
@@ -34,7 +30,7 @@
     settings = {
       user = {
         name = "Leon Lee";
-	email = "leonlee20031219@gmail.com";
+        email = "leonlee20031219@gmail.com";
       };
 
       init.defaultBranch = "main";
