@@ -59,6 +59,12 @@
   # Enable the fingerprint sensor
   services.fprintd.enable = true;
 
+  # Enable Docker service
+  virtualisation.docker = {
+    enable = true;
+    storageDriver = "btrfs";
+  };
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -91,7 +97,7 @@
   users.users."leonl" = {
     isNormalUser = true;
     description = "Leon Lee";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       kdePackages.kate
     #  thunderbird
