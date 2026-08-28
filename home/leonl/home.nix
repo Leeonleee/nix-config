@@ -20,6 +20,8 @@
     google-chrome
   ];
 
+  stylix.targets.starship.enable = false;
+
   stylix.opacity = {
     terminal = 0.9;
   };
