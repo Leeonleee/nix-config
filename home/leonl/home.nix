@@ -6,6 +6,7 @@
     ./programs/fastfetch/fastfetch.nix
     ./programs/neovim/neovim.nix
     ./programs/kitty/kitty.nix
+    ./programs/starship/starship.nix
   ];
 
   home.username = "leonl";
@@ -31,9 +32,6 @@
     };
   };
 
-  programs.starship = {
-    enable = true;
-  };
 
   programs.vesktop.enable = true;
 
