@@ -20,9 +20,13 @@
   home.packages = with pkgs; [
     bitwarden-desktop
     google-chrome
+    vscode
   ];
 
-  stylix.targets.starship.enable = false;
+  stylix.targets = {
+    starship.enable = false;
+    gtk.enable = false;
+  };
 
   stylix.opacity = {
     terminal = 0.9;
