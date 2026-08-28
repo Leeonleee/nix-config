@@ -3,6 +3,7 @@
 {
   imports = [
     ./programs/zsh.nix
+    ./programs/fastfetch.nix
   ];
 
   home.username = "leonl";
