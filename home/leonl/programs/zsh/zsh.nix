@@ -5,7 +5,7 @@
     enable = true;
 
     shellAliases = {
-      rebuild = "sudo nixos-rebuild switch --flake ~/nix-config#framework";
+      rebuild = "sudo nixos-rebuild switch --flake ~/nix-config#$(hostname)";
     };
   };
 
