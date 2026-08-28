@@ -22,9 +22,6 @@
     ];
 
     plugins = with pkgs.vimPlugins; [
-      # Colorscheme
-      catppuccin-nvim
-
       # Treesitter + parsers
       (nvim-treesitter.withPlugins (parsers: with parsers; [
 	lua

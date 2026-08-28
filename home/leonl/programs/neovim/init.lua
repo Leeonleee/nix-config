@@ -53,9 +53,6 @@ vim.diagnostic.config({
   virtual_text = true,
 })
 
--- Colorscheme
-vim.cmd.colorscheme("catppuccin")
-
 -- Treesitter
 vim.api.nvim_create_autocmd("FileType", {
   callback = function(args)
