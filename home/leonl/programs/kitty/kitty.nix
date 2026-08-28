@@ -4,10 +4,7 @@
   programs.kitty = {
     enable = true;
 
-    font = {
-      name = "JetBrainsMono Nerd Font";
-      package = pkgs.nerd-fonts.jetbrains-mono;
-    };
+    font.size = 12;
 
     settings = {
       # Catppuccin Frappé
@@ -66,7 +63,6 @@
       color7 = "#b5bfe2";
       color15 = "#a5adce";
 
-      background_opacity = "0.9";
 
       update_check_interval = 0;
     };

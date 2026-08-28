@@ -28,8 +28,6 @@ $cmd_duration\
 $line_break\
 $character"""
 
-palette = 'catppuccin_frappe'
-
 [os]
 disabled = false
 style = "bg:red fg:crust"

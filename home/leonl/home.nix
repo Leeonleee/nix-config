@@ -24,6 +24,10 @@
     neovim.enable = true;
   };
 
+  stylix.opacity = {
+    terminal = 0.9;
+  };
+
   programs.git = {
     enable = true;
 

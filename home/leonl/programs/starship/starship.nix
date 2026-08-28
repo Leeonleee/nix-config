@@ -6,7 +6,9 @@
 
     enableZshIntegration = true;
     enableBashIntegration = true;
-  };
 
-  xdg.configFile."starship.toml".source = ./starship.toml;
+    settings = builtins.fromTOML (
+      builtins.readFile ./starship.toml
+    );
+  };
 }
