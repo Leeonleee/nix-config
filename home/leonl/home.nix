@@ -4,6 +4,7 @@
   imports = [
     ./programs/zsh.nix
     ./programs/fastfetch.nix
+    ./programs/neovim.nix
   ];
 
   home.username = "leonl";
@@ -14,6 +15,7 @@
   home.packages = with pkgs; [
     bitwarden-desktop
     google-chrome
+    wl-clipboard
   ];
 
   programs.git = {
@@ -27,11 +29,6 @@
 
       init.defaultBranch = "main";
     };
-  };
-
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
   };
 
   programs.starship = {
