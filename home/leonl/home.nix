@@ -19,6 +19,11 @@
     google-chrome
   ];
 
+  stylix.targets = {
+    kitty.enable = true;
+    neovim.enable = true;
+  };
+
   programs.git = {
     enable = true;
 
