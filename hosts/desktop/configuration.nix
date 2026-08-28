@@ -16,7 +16,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Use latest kernel.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Enabling the nix command
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -68,13 +68,12 @@
     modesetting.enable = true;
     open = true;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.latest;
   };
 
   # Enable Docker service
   virtualisation.docker = {
     enable = true;
-    storageDriver = "btrfs";
   };
 
   # Configure keymap in X11
