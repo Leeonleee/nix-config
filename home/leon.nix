@@ -8,6 +8,7 @@
   
   home.packages = with pkgs; [
     bitwarden-desktop
+    google-chrome
   ];
 
   programs.git = {
@@ -34,6 +35,10 @@
   programs.neovim = {
     enable = true;
     defaultEditor = true;
+  };
+
+  programs.starship = {
+    enable = true;
   };
 
   programs.home-manager.enable = true;
