@@ -25,6 +25,8 @@
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    openwhispr.url = "github:OpenWhispr/openwhispr";
   };
 
   outputs = inputs@{

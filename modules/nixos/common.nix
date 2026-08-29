@@ -58,12 +58,17 @@
   users.users.leonl = {
     isNormalUser = true;
     description = "Leon Lee";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "ydotool" "input" ];
     shell = pkgs.zsh;
   };
 
   programs.firefox.enable = true;
   programs.zsh.enable = true;
+
+  programs.ydotool = {
+    enable = true;
+    group = "ydotool";
+  };
 
   nixpkgs.config.allowUnfree = true;
 

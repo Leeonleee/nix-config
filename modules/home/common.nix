@@ -10,6 +10,7 @@
     ./programs/eza.nix
     ./programs/herdr
     ./programs/pi.nix
+    ./programs/openwhispr.nix
   ];
 
   home.username = "leonl";
