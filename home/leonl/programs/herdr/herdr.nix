@@ -1,9 +1,4 @@
-{ inputs, pkgs, ... }:
-let
-  unstable = import inputs.nixpkgs-unstable {
-    system = pkgs.system;
-  };
-in
+{ inputs, pkgsUnstable, ... }:
 {
 
   imports = [
@@ -12,7 +7,7 @@ in
 
   programs.herdr = {
     enable = true;
-    package = unstable.herdr;
+    package = pkgsUnstable.herdr;
 
     settings = {
       theme = {

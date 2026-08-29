@@ -1,17 +1,11 @@
-{ inputs, pkgs, ... }:
-
-let
-  unstable = import inputs.nixpkgs-unstable {
-    system = pkgs.system;
-  };
-in
+{ inputs, pkgsUnstable, ... }:
 {
   imports = [
     "${inputs.home-manager-unstable}/modules/programs/pi-coding-agent.nix"
   ];
   programs.pi-coding-agent = {
     enable = true;
-    package = unstable.pi-coding-agent;
+    package = pkgsUnstable.pi-coding-agent;
 
     settings = {
       defaultProvider = "openai";

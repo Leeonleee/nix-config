@@ -33,12 +33,20 @@
     stylix,
     niri,
     ...
-  }: {
+  }: 
+  let
+        system = "x86_64-linux";
+
+        pkgsUnstable = import inputs.nixpkgs-unstable {
+          inherit system;
+        };
+      in
+  {
     nixosConfigurations.framework = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      inherit system;
 
       specialArgs = {
-        inherit inputs;
+        inherit inputs pkgsUnstable;
       };
 
       modules = [
@@ -55,7 +63,7 @@
           home-manager.useUserPackages = true;
 
           home-manager.extraSpecialArgs = {
-            inherit inputs;
+            inherit inputs pkgsUnstable;
           };
 
           home-manager.users.leonl = import ./home/leonl/home.nix;
