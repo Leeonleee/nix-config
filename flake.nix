@@ -18,22 +18,37 @@
       url = "github:danth/stylix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    niri.url = "github:sodiboo/niri-flake";
+
+    dms = {
+      url = "github:AvengeMedia/DankMaterialShell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{
     nixpkgs,
     home-manager,
     stylix,
+    niri,
     ...
   }: {
     nixosConfigurations.framework = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+
+      specialArgs = {
+        inherit inputs;
+      };
 
       modules = [
         ./hosts/framework/configuration.nix
 
         home-manager.nixosModules.home-manager
         stylix.nixosModules.stylix
+        niri.nixosModules.niri
+
+
 
         {
           home-manager.useGlobalPkgs = true;

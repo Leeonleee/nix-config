@@ -10,6 +10,8 @@
     ./programs/eza/eza.nix
     ./programs/herdr/herdr.nix
     ./programs/pi/pi.nix
+    ./programs/niri/niri.nix
+    ./programs/dms/dms.nix
   ];
 
   home.username = "leonl";

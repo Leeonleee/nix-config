@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports =
@@ -120,6 +120,15 @@
 
   # Install zsh
   programs.zsh.enable = true;
+
+  # Install niri
+  nixpkgs.overlays = [
+    inputs.niri.overlays.niri
+  ];
+  programs.niri = {
+    enable = true;
+    package = pkgs.niri-unstable;
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
