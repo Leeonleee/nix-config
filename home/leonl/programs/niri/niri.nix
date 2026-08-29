@@ -17,11 +17,6 @@
     settings = {
       main = {
         font = lib.mkForce "${config.stylix.fonts.sansSerif.name}:size=14";
-        width = 30;
-        lines = 10;
-
-        horizontal-pad = 30;
-        vertical-pad = 15;
 
         layer = "overlay";
       };
