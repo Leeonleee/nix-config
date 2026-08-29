@@ -13,6 +13,15 @@
 
   services.fprintd.enable = true;
 
+  # Suspend on lid close when using the laptop by itself, but keep running in
+  # clamshell mode when an external monitor is connected. Being on AC power
+  # alone should not prevent suspension.
+  services.logind.settings.Login = {
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "suspend";
+    HandleLidSwitchDocked = "ignore";
+  };
+
   virtualisation.docker.storageDriver = "btrfs";
 
   nixpkgs.overlays = [

@@ -146,8 +146,8 @@
        loginctlLockIntegration = true;
        lockBeforeSuspend = true;
 
-       acLockTimeout = 600;
-       batteryLockTimeout = 300;
+       acLockTimeout = 0;
+       batteryLockTimeout = 0;
 
        acPostLockMonitorTimeout = 60;
        batteryPostLockMonitorTimeout = 30;
