@@ -1,10 +1,5 @@
 { inputs, pkgsUnstable, ... }:
 {
-
-  imports = [
-    "${inputs.home-manager-unstable}/modules/programs/herdr.nix"
-  ];
-
   programs.herdr = {
     enable = true;
     package = pkgsUnstable.herdr;
