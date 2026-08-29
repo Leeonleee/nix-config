@@ -66,7 +66,10 @@
             inherit inputs pkgsUnstable;
           };
 
-          home-manager.users.leonl = import ./home/leonl/home.nix;
+          home-manager.users.leonl.imports = [
+            ./modules/home/common.nix
+            ./modules/home/profiles/niri.nix
+          ];
         }
       ];
     };
@@ -85,10 +88,12 @@
           home-manager.useUserPackages = true;
 
           home-manager.extraSpecialArgs = {
-            inherit inputs;
+            inherit inputs pkgsUnstable;
           };
 
-          home-manager.users.leonl = import ./home/leonl/home.nix;
+          home-manager.users.leonl.imports = [
+            ./modules/home/common.nix
+          ];
         }
       ];
     };

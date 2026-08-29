@@ -1,18 +1,16 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
-    ../../modules/home-manager-unstable.nix
-    ./programs/zsh/zsh.nix
-    ./programs/fastfetch/fastfetch.nix
-    ./programs/neovim/neovim.nix
-    ./programs/kitty/kitty.nix
-    ./programs/starship/starship.nix
-    ./programs/eza/eza.nix
-    ./programs/herdr/herdr.nix
-    ./programs/pi/pi.nix
-    ./programs/niri/niri.nix
-    ./programs/dms/dms.nix
+    ../home-manager-unstable.nix
+    ../../home/leonl/programs/zsh/zsh.nix
+    ../../home/leonl/programs/fastfetch/fastfetch.nix
+    ../../home/leonl/programs/neovim/neovim.nix
+    ../../home/leonl/programs/kitty/kitty.nix
+    ../../home/leonl/programs/starship/starship.nix
+    ../../home/leonl/programs/eza/eza.nix
+    ../../home/leonl/programs/herdr/herdr.nix
+    ../../home/leonl/programs/pi/pi.nix
   ];
 
   home.username = "leonl";
