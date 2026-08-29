@@ -4,6 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/nixos/common.nix
+    inputs.nirinit.nixosModules.nirinit
   ];
 
   networking.hostName = "framework";
@@ -21,6 +22,16 @@
   programs.niri = {
     enable = true;
     package = pkgs.niri-unstable;
+  };
+
+  services.nirinit = {
+    enable = true;
+
+    settings = {
+      skip.apps = [];
+
+      launch = {};
+    };
   };
 
   # Niri's default GNOME portal delegates its file chooser to Nautilus, which
