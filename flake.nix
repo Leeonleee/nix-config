@@ -41,66 +41,55 @@
       inherit system;
       config.allowUnfree = true;
     };
+
+    mkHost = {
+      hostname,
+      extraModules ? [ ],
+      homeModules ? [ ],
+    }:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+
+        specialArgs = {
+          inherit inputs pkgsUnstable;
+        };
+
+        modules = [
+          ./hosts/${hostname}/configuration.nix
+          home-manager.nixosModules.home-manager
+          stylix.nixosModules.stylix
+        ] ++ extraModules ++ [
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+
+            home-manager.extraSpecialArgs = {
+              inherit inputs pkgsUnstable;
+            };
+
+            home-manager.users.leonl.imports =
+              [ ./modules/home/common.nix ] ++ homeModules;
+          }
+        ];
+      };
   in
   {
-    nixosConfigurations.framework = nixpkgs.lib.nixosSystem {
-      inherit system;
-
-      specialArgs = {
-        inherit inputs pkgsUnstable;
+    nixosConfigurations = {
+      desktop = mkHost {
+        hostname = "desktop";
       };
 
-      modules = [
-        ./hosts/framework/configuration.nix
+      framework = mkHost {
+        hostname = "framework";
 
-        home-manager.nixosModules.home-manager
-        stylix.nixosModules.stylix
-        niri.nixosModules.niri
+        extraModules = [
+          niri.nixosModules.niri
+        ];
 
-
-
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-
-          home-manager.extraSpecialArgs = {
-            inherit inputs pkgsUnstable;
-          };
-
-          home-manager.users.leonl.imports = [
-            ./modules/home/common.nix
-            ./modules/home/profiles/niri.nix
-          ];
-        }
-      ];
-    };
-
-    nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-      inherit system;
-
-      specialArgs = {
-        inherit inputs pkgsUnstable;
+        homeModules = [
+          ./modules/home/profiles/niri.nix
+        ];
       };
-
-      modules = [
-        ./hosts/desktop/configuration.nix
-
-        home-manager.nixosModules.home-manager
-        stylix.nixosModules.stylix
-
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-
-          home-manager.extraSpecialArgs = {
-            inherit inputs pkgsUnstable;
-          };
-
-          home-manager.users.leonl.imports = [
-            ./modules/home/common.nix
-          ];
-        }
-      ];
     };
   };
 }
