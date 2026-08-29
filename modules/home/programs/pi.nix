@@ -35,7 +35,6 @@ in
 
       packages = [
         "npm:pi-init"
-        "npm:pi-clear"
       ];
     };
   };
