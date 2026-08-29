@@ -1,13 +1,32 @@
-{ pkgs, ... }:
+{ pkgs, lib, config, ... }:
 
 {
   # Niri-specific applications/utilities.
   home.packages = with pkgs; [
     brightnessctl
-    nautilus
     playerctl
     wl-clipboard
+    fuzzel
   ];
+
+  stylix.targets.fuzzel.enable = true;
+
+  programs.fuzzel = {
+    enable = true;
+
+    settings = {
+      main = {
+        font = lib.mkForce "${config.stylix.fonts.sansSerif.name}:size=14";
+        width = 30;
+        lines = 10;
+
+        horizontal-pad = 30;
+        vertical-pad = 15;
+
+        layer = "overlay";
+      };
+    };
+  };
 
   programs.niri.settings = {
     # Electron apps such as VS Code use native Wayland.
@@ -57,7 +76,7 @@
 
     outputs = {
       "eDP-1" = {
-        scale = 1.75;
+        scale = 1.5;
 
         transform = {
           rotation = 0;
@@ -244,8 +263,8 @@
       };
 
       "Mod+T" = {
-        hotkey-overlay.title = "Open file manager: nautilus";
-        action.spawn = "nautilus";
+        hotkey-overlay.title = "Open file manager: Dolphin";
+        action.spawn = "dolphin";
       };
 
       "Super+Alt+S" = {
