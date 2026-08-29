@@ -34,6 +34,11 @@
     };
   };
 
+  security.pam.services.dankshell = {
+    # DMS handles fingerprints separately
+    fprintAuth = false;
+  };
+
   # Niri's default GNOME portal delegates its file chooser to Nautilus, which
   # is not installed. Use the KDE file chooser alongside Dolphin instead.
   xdg.mime.defaultApplications."inode/directory" =

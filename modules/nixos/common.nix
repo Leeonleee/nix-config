@@ -16,6 +16,9 @@
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
+  # OpenWhispr uses uinput to auto-paste into native Wayland applications.
+  hardware.uinput.enable = true;
+
   time.timeZone = "Australia/Sydney";
 
   i18n.defaultLocale = "en_AU.UTF-8";
@@ -58,7 +61,7 @@
   users.users.leonl = {
     isNormalUser = true;
     description = "Leon Lee";
-    extraGroups = [ "networkmanager" "wheel" "docker" "ydotool" "input" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "ydotool" "input" "uinput" ];
     shell = pkgs.zsh;
   };
 

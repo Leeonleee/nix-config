@@ -27,6 +27,13 @@
     # Electron apps such as VS Code use native Wayland.
     environment."NIXOS_OZONE_WL" = "1";
 
+    # OpenWhispr forces XWayland for its overlay and global shortcut support.
+    # Use an absolute path because xwayland-satellite is not otherwise on PATH.
+    xwayland-satellite = {
+      enable = true;
+      path = lib.getExe pkgs.xwayland-satellite-unstable;
+    };
+
     # -------------------------------------------------------------------------
     # Workspaces
     # -------------------------------------------------------------------------
@@ -253,8 +260,14 @@
       };
 
       "Super+Alt+L" = {
-        hotkey-overlay.title = "Lock the Screen: swaylock";
-        action.spawn = "swaylock";
+        hotkey-overlay.title = "Lock the Screen: DMS";
+        action.spawn = [
+          "dms"
+          "ipc"
+          "call"
+          "lock"
+          "lock"
+        ];
       };
 
       "Mod+T" = {
