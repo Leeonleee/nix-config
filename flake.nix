@@ -33,14 +33,15 @@
     stylix,
     niri,
     ...
-  }: 
+  }:
   let
-        system = "x86_64-linux";
+    system = "x86_64-linux";
 
-        pkgsUnstable = import inputs.nixpkgs-unstable {
-          inherit system;
-        };
-      in
+    pkgsUnstable = import inputs.nixpkgs-unstable {
+      inherit system;
+      config.allowUnfree = true;
+    };
+  in
   {
     nixosConfigurations.framework = nixpkgs.lib.nixosSystem {
       inherit system;
@@ -75,7 +76,11 @@
     };
 
     nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      inherit system;
+
+      specialArgs = {
+        inherit inputs pkgsUnstable;
+      };
 
       modules = [
         ./hosts/desktop/configuration.nix
