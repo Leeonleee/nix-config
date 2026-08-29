@@ -1,7 +1,7 @@
 {
   imports = [
     ./packages.nix
-    ../home-manager-unstable.nix
+    ./home-manager-unstable.nix
     ./programs/zsh.nix
     ./programs/fastfetch.nix
     ./programs/neovim
