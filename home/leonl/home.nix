@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ../../modules/home-manager-unstable.nix
     ./programs/zsh/zsh.nix
     ./programs/fastfetch/fastfetch.nix
     ./programs/neovim/neovim.nix
