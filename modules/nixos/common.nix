@@ -59,9 +59,6 @@
     isNormalUser = true;
     description = "Leon Lee";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
-    packages = with pkgs; [
-      kdePackages.kate
-    ];
     shell = pkgs.zsh;
   };
 

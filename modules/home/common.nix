@@ -1,7 +1,6 @@
-{ pkgs, ... }:
-
 {
   imports = [
+    ./packages.nix
     ../home-manager-unstable.nix
     ../../home/leonl/programs/zsh/zsh.nix
     ../../home/leonl/programs/fastfetch/fastfetch.nix
@@ -17,12 +16,6 @@
   home.homeDirectory = "/home/leonl";
 
   home.stateVersion = "26.05";
-  
-  home.packages = with pkgs; [
-    bitwarden-desktop
-    google-chrome
-    vscode
-  ];
 
   stylix.targets = {
     starship.enable = false;
