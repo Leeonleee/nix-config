@@ -22,4 +22,14 @@
     enable = true;
     package = pkgs.niri-unstable;
   };
+
+  # Niri's default GNOME portal delegates its file chooser to Nautilus, which
+  # is not installed. Use the KDE file chooser alongside Dolphin instead.
+  xdg.portal.config.niri = {
+    default = [ "gnome" "gtk" ];
+    "org.freedesktop.impl.portal.Access" = "gtk";
+    "org.freedesktop.impl.portal.FileChooser" = "kde";
+    "org.freedesktop.impl.portal.Notification" = "gtk";
+    "org.freedesktop.impl.portal.Secret" = "gnome-keyring";
+  };
 }
