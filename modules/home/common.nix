@@ -2,14 +2,14 @@
   imports = [
     ./packages.nix
     ../home-manager-unstable.nix
-    ../../home/leonl/programs/zsh/zsh.nix
-    ../../home/leonl/programs/fastfetch/fastfetch.nix
-    ../../home/leonl/programs/neovim/neovim.nix
-    ../../home/leonl/programs/kitty/kitty.nix
-    ../../home/leonl/programs/starship/starship.nix
-    ../../home/leonl/programs/eza/eza.nix
-    ../../home/leonl/programs/herdr/herdr.nix
-    ../../home/leonl/programs/pi/pi.nix
+    ./programs/zsh.nix
+    ./programs/fastfetch.nix
+    ./programs/neovim
+    ./programs/kitty.nix
+    ./programs/starship
+    ./programs/eza.nix
+    ./programs/herdr
+    ./programs/pi.nix
   ];
 
   home.username = "leonl";
