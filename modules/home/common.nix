@@ -10,11 +10,15 @@
     ./programs/eza.nix
     ./programs/herdr
     ./programs/pi.nix
-    ./programs/openwhispr.nix
   ];
 
   home.username = "leonl";
   home.homeDirectory = "/home/leonl";
+
+  home.homeDirectory =
+    if pkgs.stdenv.isDawrin
+    then "/Users/leonlee"
+    else "/home/leonl";
 
   home.stateVersion = "26.05";
 
