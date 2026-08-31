@@ -129,6 +129,8 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
 
+        home-manager.backupFileExtension = "before-home-manager";
+
         home-manager.extraSpecialArgs = {
           inherit inputs;
           pkgsUnstable = pkgsUnstableDarwin;
