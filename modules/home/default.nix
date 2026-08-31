@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ./theme.nix
     ./home-manager-unstable.nix
     ./programs/zsh.nix
     ./programs/fastfetch.nix
@@ -20,15 +21,6 @@
   ];
 
   home.stateVersion = "26.05";
-
-  stylix.targets = {
-    starship.enable = false;
-    gtk.enable = false;
-  };
-
-  stylix.opacity = {
-    terminal = 0.9;
-  };
 
   programs.git = {
     enable = true;
