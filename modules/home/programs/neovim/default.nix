@@ -9,15 +9,16 @@
     vimAlias = true;
 
     # Programs Neovim/plugins need available on PATH
-    extraPackages = with pkgs; [
+    extraPackages = with pkgs;
+    [
       # LSPs
       lua-language-server
 
       # Telescope
       ripgrep
       fd
-
-      # Clipboard support on Wayland
+    ]
+    ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
       wl-clipboard
     ];
 

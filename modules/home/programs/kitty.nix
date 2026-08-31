@@ -4,7 +4,10 @@
   programs.kitty = {
     enable = true;
 
-    font.size = 12;
+    font = {
+      name = "JetBrainsMono Nerd Font";
+      size = 12;
+    };
 
     settings = {
       # Catppuccin Frappé
