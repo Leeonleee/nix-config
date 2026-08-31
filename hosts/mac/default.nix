@@ -1,12 +1,14 @@
 { ... }:
 
 {
-  system.primaryUser = "leonl";
+  system.primaryUser = "leonlee";
 
-  users.users.leonl = {
-    name = "leonl";
-    home = "/Users/leonl";
+  users.users.leonlee = {
+    name = "leonlee";
+    home = "/Users/leonlee";
   };
+
+  nixpkgs.config.allowUnfree = true;
 
   system.stateVersion = 6;
 }

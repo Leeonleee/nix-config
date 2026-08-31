@@ -55,6 +55,11 @@
       config.allowUnfree = true;
     };
 
+    pkgsUnstableDarwin = import inputs.nixpkgs-unstable {
+      system = "aarch64-darwin";
+      config.allowUnfree = true;
+    };
+
     mkHost = {
       hostname,
       extraModules ? [ ],
@@ -108,7 +113,7 @@
       };
     };
 
-    darwinConfigurations.macbook = nix-darwin.lib.darwinSystem {
+    darwinConfigurations.mac = nix-darwin.lib.darwinSystem {
     system = "aarch64-darwin";
 
     specialArgs = {
@@ -116,7 +121,7 @@
     };
 
     modules = [
-      ./hosts/macbook/default.nix
+      ./hosts/mac/default.nix
 
       home-manager.darwinModules.home-manager
 
@@ -126,9 +131,11 @@
 
         home-manager.extraSpecialArgs = {
           inherit inputs;
+          pkgsUnstable = pkgsUnstableDarwin;
         };
 
-        home-manager.users.leonl.imports = [
+        home-manager.users.leonlee.imports = [
+          stylix.homeModules.stylix
           ./modules/home/common.nix
           ./modules/home/macos.nix
         ];

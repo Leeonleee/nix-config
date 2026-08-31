@@ -1,3 +1,5 @@
+{ pkgs, ... }:
+
 {
   imports = [
     ./packages.nix
@@ -11,14 +13,6 @@
     ./programs/herdr
     ./programs/pi.nix
   ];
-
-  home.username = "leonl";
-  home.homeDirectory = "/home/leonl";
-
-  home.homeDirectory =
-    if pkgs.stdenv.isDawrin
-    then "/Users/leonlee"
-    else "/home/leonl";
 
   home.stateVersion = "26.05";
 
