@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ./packages.nix
     ./home-manager-unstable.nix
     ./programs/zsh.nix
     ./programs/fastfetch.nix
@@ -12,6 +11,12 @@
     ./programs/eza.nix
     ./programs/herdr
     ./programs/pi.nix
+  ];
+
+  home.packages = with pkgs; [
+    bitwarden-desktop
+    google-chrome
+    vscode
   ];
 
   home.stateVersion = "26.05";
@@ -37,7 +42,6 @@
       init.defaultBranch = "main";
     };
   };
-
 
   programs.vesktop.enable = true;
 

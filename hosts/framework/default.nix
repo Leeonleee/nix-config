@@ -3,7 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/nixos/common.nix
+    ../../modules/nixos
     inputs.nirinit.nixosModules.nirinit
   ];
 
@@ -53,9 +53,9 @@
     enable = true;
 
     settings = {
-      skip.apps = [];
+      skip.apps = [ ];
 
-      launch = {};
+      launch = { };
     };
   };
 
@@ -66,11 +66,13 @@
 
   # Niri's default GNOME portal delegates its file chooser to Nautilus, which
   # is not installed. Use the KDE file chooser alongside Dolphin instead.
-  xdg.mime.defaultApplications."inode/directory" =
-    "org.kde.dolphin.desktop";
+  xdg.mime.defaultApplications."inode/directory" = "org.kde.dolphin.desktop";
 
   xdg.portal.config.niri = {
-    default = [ "gnome" "gtk" ];
+    default = [
+      "gnome"
+      "gtk"
+    ];
     "org.freedesktop.impl.portal.Access" = "gtk";
     "org.freedesktop.impl.portal.FileChooser" = "kde";
     "org.freedesktop.impl.portal.Notification" = "gtk";

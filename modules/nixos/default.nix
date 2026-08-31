@@ -2,14 +2,17 @@
 
 {
   imports = [
-    ../theme.nix
+    ./theme.nix
   ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   networking.networkmanager.enable = true;
 
@@ -61,7 +64,14 @@
   users.users.leonl = {
     isNormalUser = true;
     description = "Leon Lee";
-    extraGroups = [ "networkmanager" "wheel" "docker" "ydotool" "input" "uinput" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+      "ydotool"
+      "input"
+      "uinput"
+    ];
     shell = pkgs.zsh;
   };
 

@@ -1,8 +1,8 @@
-# modules/home/linux.nix
+{ pkgs, ... }:
 
 {
   imports = [
-    ./programs/openwhispr.nix
+    ../programs/openwhispr.nix
   ];
 
   home.username = "leonl";
