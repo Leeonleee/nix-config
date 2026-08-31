@@ -10,7 +10,6 @@
     };
 
     settings = {
-      background_opacity = 0.9;
       # Catppuccin Frappé
       foreground = "#c6d0f5";
       background = "#303446";
@@ -69,8 +68,9 @@
 
 
       update_check_interval = 0;
-    };
-
+    } // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+      background_opacity = 0.9;
+      };
     keybindings = {
       "alt+1" = "goto_tab 1";
       "alt+2" = "goto_tab 2";
