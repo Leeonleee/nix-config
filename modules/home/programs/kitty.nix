@@ -10,6 +10,7 @@
     };
 
     settings = {
+      background_opacity = 0.9;
       # Catppuccin Frappé
       foreground = "#c6d0f5";
       background = "#303446";
