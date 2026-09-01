@@ -19,6 +19,8 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
+    nixvim.url = "github:nix-community/nixvim/nixos-26.05";
+
     stylix = {
       url = "github:danth/stylix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";

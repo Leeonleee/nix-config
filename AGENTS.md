@@ -85,7 +85,7 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 
 ### Lua and TOML
 
-- Neovim Lua in `modules/home/programs/neovim/init.lua` uses two-space indentation and plugin setup grouped by concern.
+- Neovim is configured declaratively with Nixvim in `modules/home/programs/neovim/default.nix`; prefer typed Nixvim options and keep raw Lua limited to runtime-only behavior.
 - TOML configurations are loaded declaratively with `builtins.fromTOML (builtins.readFile ...)` when they are active.
 - `modules/home/programs/starship/starship.toml` is the source of the managed Starship configuration.
 - `modules/home/programs/herdr/config.toml` is currently not imported because its `xdg.configFile` declaration is commented out; active Herdr settings live in `modules/home/programs/herdr/default.nix`.
