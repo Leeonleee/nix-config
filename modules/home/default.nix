@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./theme.nix
+    ../theme.nix
     ./home-manager-unstable.nix
     ./programs/zsh.nix
     ./programs/fastfetch.nix
@@ -13,6 +13,10 @@
     ./programs/herdr
     ./programs/pi.nix
   ];
+  stylix.targets = {
+    starship.enable = false;
+    gtk.enable = false;
+  };
 
   home.packages = with pkgs; [
     bitwarden-desktop

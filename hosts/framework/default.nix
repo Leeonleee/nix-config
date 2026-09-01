@@ -36,6 +36,8 @@
         LocalForward 5173 [::1]:5173
         LocalForward 3000 127.0.0.1:3000
         LocalForward 54321 127.0.0.1:54321
+        LocalForward 54322 127.0.0.1:54322
+        LocalForward 54323 127.0.0.1:54323
         LocalForward 54324 127.0.0.1:54324
     '';
   };

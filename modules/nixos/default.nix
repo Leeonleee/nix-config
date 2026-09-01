@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./theme.nix
+    ../theme.nix
   ];
 
   # Bootloader.
