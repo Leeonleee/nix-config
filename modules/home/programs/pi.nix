@@ -35,6 +35,7 @@ in
 
       packages = [
         "npm:pi-init"
+        "npm:pi-subagents@0.65.0"
       ];
     };
   };
