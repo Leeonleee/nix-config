@@ -22,6 +22,7 @@
     bitwarden-desktop
     google-chrome
     vscode
+    lsof
   ];
 
   home.stateVersion = "26.05";
@@ -40,6 +41,5 @@
   };
 
   programs.vesktop.enable = true;
-
   programs.home-manager.enable = true;
 }
