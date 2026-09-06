@@ -32,7 +32,7 @@
 
 
       Host l2v-dev
-        HostName dev
+        HostName dev-nix
         User leonl
         ExitOnForwardFailure yes
         ServerAliveInterval 30
