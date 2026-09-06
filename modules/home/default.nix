@@ -12,6 +12,7 @@
     ./programs/eza.nix
     ./programs/herdr
     ./programs/pi.nix
+    ./programs/claude-code.nix
   ];
   stylix.targets = {
     starship.enable = false;
