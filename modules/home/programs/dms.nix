@@ -12,13 +12,14 @@
 
    programs.dank-material-shell = {
      enable = true;
-
      systemd.enable = true;
-
+     session.wallpaperPath = "${../../../assets/wallpapers/lavender-cat.png}";
+      
      # Migrated from the old DMS configVersion 13 settings file to the current
      # configVersion 16 format. Values matching DMS defaults and obsolete or
      # machine-specific keys have been omitted.
      settings = {
+       wallpaperFillMode = "Fill";
        cornerRadius = 12;
        barElevationEnabled = false;
        controlCenterShowMicPercent = true;
@@ -137,6 +138,7 @@
            shadowColorMode = "text";
            shadowCustomColor = "#000000";
            clickThrough = false;
+
          }
        ];
 
