@@ -30,8 +30,8 @@ in
 
     settings = {
       defaultProvider = "openai-codex";
-      defaultThinkingLevel = "high";
-      defaultModel = "gpt-5.6-sol";
+      defaultThinkingLevel = "medium";
+      defaultModel = "gpt-6-astra";
 
       packages = [
         "npm:pi-init"

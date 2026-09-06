@@ -22,7 +22,9 @@
     bitwarden-desktop
     google-chrome
     vscode
+
     lsof
+    gh
   ];
 
   home.stateVersion = "26.05";
