@@ -117,6 +117,11 @@
             ./modules/home/profiles/niri.nix
           ];
         };
+
+	dev-nix = mkHost {
+	    hostname = "dev-nix";
+	};
+
       };
 
       darwinConfigurations.mac = nix-darwin.lib.darwinSystem {
