@@ -96,7 +96,7 @@
         resume_agents_on_restore = true;
       };
       experimental = {
-        pane_history = false;
+        pane_history = true;
       };
     };
   };
