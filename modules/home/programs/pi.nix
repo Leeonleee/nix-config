@@ -33,6 +33,10 @@ in
       defaultThinkingLevel = "medium";
       defaultModel = "gpt-6-astra";
 
+      skills = [
+        "${config.home.homeDirectory}/agents/skills"
+      ];
+
       packages = [
         "npm:pi-init"
         "npm:pi-subagents@0.65.0"
