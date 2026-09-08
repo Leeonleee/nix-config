@@ -39,7 +39,7 @@ in
 
       packages = [
         "npm:pi-init"
-        "npm:pi-subagents@0.65.0"
+        "npm:pi-subagents"
         "npm:pi-btw"
         "npm:pi-clear-screen"
         "npm:pi-simplify"
