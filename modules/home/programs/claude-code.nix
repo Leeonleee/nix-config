@@ -1,4 +1,4 @@
-{ pkgsUnstable, ... }:
+{ config, pkgsUnstable, ... }:
 
 {
   programs.claude-code = {
@@ -12,4 +12,5 @@
       };
     };
   };
+  home.file."${config.programs.claude-code.configDir}/settings.json".force = true;
 }

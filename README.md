@@ -50,9 +50,12 @@ Replace `framework` with `desktop` when applying the desktop configuration. `tes
 After the first successful switch, flakes are enabled and these Zsh aliases are available:
 
 ```sh
+rebuild-check  # Evaluate the flake without building or activating
 rebuild-test   # Test the configuration for the current hostname
 rebuild        # Apply it permanently
 ```
+
+`rebuild-check` also works on macOS. It checks `~/nix-config` from any working directory and does not require sudo.
 
 For a new computer, create a new directory under `hosts/`, use that computer's generated `hardware-configuration.nix`, and add the host to `nixosConfigurations` in `flake.nix` before rebuilding.
 

@@ -11,6 +11,8 @@
   '';
 
     shellAliases = {
+      rebuild-check = "nix --extra-experimental-features 'nix-command flakes' flake check --no-build ~/nix-config";
+
       rebuild =
         if pkgs.stdenv.isDarwin
         then "sudo darwin-rebuild switch --flake ~/nix-config#mac"
