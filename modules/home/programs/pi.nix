@@ -43,6 +43,7 @@ in
         "npm:pi-btw"
         "npm:pi-clear-screen"
         "npm:pi-simplify"
+        "npm:@narumitw/pi-plan-mode"
       ];
     };
   };

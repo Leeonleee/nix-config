@@ -27,6 +27,7 @@
     lsof
     gh
     usbutils
+    
   ];
 
   home.stateVersion = "26.05";
