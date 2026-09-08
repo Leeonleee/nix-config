@@ -74,6 +74,8 @@
   # Niri's default GNOME portal delegates its file chooser to Nautilus, which
   # is not installed. Use the KDE file chooser alongside Dolphin instead.
   xdg.mime.defaultApplications."inode/directory" = "org.kde.dolphin.desktop";
+  environment.etc."xdg/menus/applications.menu".source =
+    "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 
   xdg.portal.config.niri = {
     default = [
