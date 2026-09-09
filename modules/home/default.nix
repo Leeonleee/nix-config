@@ -10,7 +10,7 @@
     ./programs/kitty.nix
     ./programs/starship
     ./programs/eza.nix
-    ./programs/herdr
+    ./programs/herdr.nix
     ./programs/pi.nix
     ./programs/claude-code.nix
   ];
