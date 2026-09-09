@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
 
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
@@ -58,7 +59,17 @@
         config.allowUnfree = true;
       };
 
+      pkgsMaster = import inputs.nixpkgs-master {
+        inherit system;
+        config.allowUnfree = true;
+      };
+
       pkgsUnstableDarwin = import inputs.nixpkgs-unstable {
+        system = "aarch64-darwin";
+        config.allowUnfree = true;
+      };
+
+      pkgsMasterDarwin = import inputs.nixpkgs-master {
         system = "aarch64-darwin";
         config.allowUnfree = true;
       };
@@ -88,7 +99,7 @@
               home-manager.useUserPackages = true;
 
               home-manager.extraSpecialArgs = {
-                inherit inputs pkgsUnstable;
+                inherit inputs pkgsUnstable pkgsMaster;
               };
 
               home-manager.users.leonl.imports = [
@@ -145,6 +156,7 @@
             home-manager.extraSpecialArgs = {
               inherit inputs;
               pkgsUnstable = pkgsUnstableDarwin;
+              pkgsMaster = pkgsMasterDarwin;
             };
 
             home-manager.users.leonlee.imports = [

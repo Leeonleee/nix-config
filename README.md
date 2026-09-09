@@ -98,6 +98,27 @@ Add `pkgsUnstable` to the module arguments, then prefix the package with `pkgsUn
 
 `pkgsUnstable` is already created and passed to all NixOS and Home Manager modules by `flake.nix`.
 
+### Check package availability on a system
+
+To check whether any package exists in the `nixpkgs-master` package set for a specific system, run this from the repository root. Replace the two `--argstr` values as needed:
+
+```sh
+nix eval --impure --json \
+  --argstr package herdr \
+  --argstr system aarch64-darwin \
+  --expr '
+    let
+      flake = builtins.getFlake (toString ./.);
+      pkgs = import flake.inputs.nixpkgs-master {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in builtins.hasAttr package pkgs
+  '
+```
+
+The result is `true` or `false`. This checks that the package attribute exists; test whether it actually builds with `nix build --impure --no-link` using the same package set.
+
 Apply package changes with `rebuild-test`, then `rebuild` when everything works.
 
 ## Update dependencies

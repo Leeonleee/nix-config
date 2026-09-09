@@ -1,8 +1,8 @@
-{ inputs, pkgsUnstable, ... }:
+{ inputs, pkgsUnstable, pkgsMaster, ... }:
 {
   programs.herdr = {
     enable = true;
-    package = pkgsUnstable.herdr;
+    package = pkgsMaster.herdr;
 
     settings = {
       theme = {
