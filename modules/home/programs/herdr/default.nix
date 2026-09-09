@@ -5,6 +5,7 @@
     package = pkgsMaster.herdr;
 
     settings = {
+      onboarding = false;
       theme = {
         name = "catppuccin";
         auto_switch = true;
