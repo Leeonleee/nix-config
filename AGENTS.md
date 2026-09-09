@@ -76,7 +76,8 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Keep modules focused and compose them through `imports` rather than growing a single large host file.
 - Put settings shared by all users in `modules/home/default.nix` and platform differences in `modules/home/platforms/`.
 - Put machine-specific system settings under `hosts/<name>/`.
-- Pass flake inputs or unstable packages through module arguments instead of importing package sets inside leaf modules.
+- Pass flake inputs or package sets through module arguments instead of importing package sets inside leaf modules. Package sets used by Home Manager modules must be passed through `home-manager.extraSpecialArgs`; NixOS `specialArgs` do not propagate into Home Manager.
+- Keep package sets platform-native: use an `aarch64-darwin` import for `pkgsMaster` on macOS rather than reusing the `x86_64-linux` package set.
 - Use `pkgs.lib.optionals pkgs.stdenv.isLinux` or platform modules when a package is not portable.
 - Keep comments for non-obvious operational constraints, such as portal selection, DMS restart behavior, or application compatibility.
 - No Nix formatter, linter, or flake `formatter` output is currently configured.
@@ -89,6 +90,7 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - TOML configurations are loaded declaratively with `builtins.fromTOML (builtins.readFile ...)` when they are active.
 - `modules/home/programs/starship/starship.toml` is the source of the managed Starship configuration.
 - `modules/home/programs/herdr/config.toml` is currently not imported because its `xdg.configFile` declaration is commented out; active Herdr settings live in `modules/home/programs/herdr/default.nix`.
+- Herdr's Home Manager module generates a read-only config in the Nix store. Keep Herdr declarative by setting `programs.herdr.settings.onboarding = false;` and adding desired settings to the Nix `settings` attribute; do not enable the separate `xdg.configFile` source or rely on Herdr writing settings interactively.
 
 ## COMMON CHANGE LOCATIONS
 
