@@ -15,6 +15,11 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
 
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -61,6 +66,7 @@
       home-manager,
       stylix,
       niri,
+      lanzaboote,
       ...
     }:
     let
@@ -130,6 +136,10 @@
       nixosConfigurations = {
         desktop = mkHost {
           hostname = "desktop";
+
+          extraModules = [
+            lanzaboote.nixosModules.lanzaboote
+          ];
         };
 
         framework = mkHost {

@@ -5,6 +5,7 @@
     ./hardware-configuration.nix
     ../../modules/nixos
     ../../modules/nixos/workstation.nix
+    ../../modules/nixos/secure-boot.nix
   ];
 
   networking.hostName = "desktop";
