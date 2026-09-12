@@ -139,6 +139,11 @@
 
           extraModules = [
             lanzaboote.nixosModules.lanzaboote
+            niri.nixosModules.niri
+          ];
+
+          homeModules = [
+            ./modules/home/profiles/niri.nix
           ];
         };
 
