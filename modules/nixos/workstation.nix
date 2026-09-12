@@ -1,6 +1,10 @@
 { ... }:
 
 {
+  # Stylix supplies the Plymouth theme; only enable the boot splash here.
+  boot.plymouth.enable = true;
+  boot.kernelParams = [ "quiet" ];
+
   # Graphical workstation services shared by desktop and framework.
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
