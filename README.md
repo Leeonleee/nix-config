@@ -115,7 +115,8 @@ Check failures with `journalctl --user -u voxtype -b`.
 
 On Framework, the DMS bar includes a Voxtype status widget showing Ready,
 Recording, Transcribing, or Stopped. Its source is in
-`modules/home/programs/dms-voxtype/`; Home Manager installs and enables it.
+`modules/home/programs/dms-voxtype.nix`; Nix generates its JSON manifest and QML
+component in the store, and Home Manager installs and enables it.
 After widget-only changes, restart DMS with `systemctl --user restart dms`.
 
 ### Package scopes
