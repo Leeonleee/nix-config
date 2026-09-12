@@ -27,7 +27,7 @@
     # Electron apps such as VS Code use native Wayland.
     environment."NIXOS_OZONE_WL" = "1";
 
-    # OpenWhispr forces XWayland for its overlay and global shortcut support.
+    # Support applications that require XWayland.
     # Use an absolute path because xwayland-satellite is not otherwise on PATH.
     xwayland-satellite = {
       enable = true;

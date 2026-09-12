@@ -5,7 +5,7 @@
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
-  # OpenWhispr uses uinput to auto-paste into native Wayland applications.
+  # Support input simulation for tools such as ydotool.
   hardware.uinput.enable = true;
 
   services.xserver.enable = true;

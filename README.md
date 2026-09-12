@@ -109,7 +109,7 @@ Add a package according to where it should be available:
 | Universal CLI tools | `modules/home/default.nix` | `gh`, `lsof` |
 | Universal graphical apps | `modules/home/profiles/universal-apps.nix` | Bitwarden, Chrome |
 | Daily apps for graphical hosts | `modules/home/profiles/general-use.nix` | VS Code, ChatGPT, Vesktop |
-| Linux workstation apps | `modules/home/profiles/linux-workstation.nix` | Kate, OpenWhispr |
+| Linux workstation apps | `modules/home/profiles/linux-workstation.nix` | Kate |
 | OS-specific settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |
 | One device only | `hosts/<device>/home.nix` | Claude Desktop on Framework |
 | Device-specific configuration | The same host file, or a module imported from it | App settings and services |

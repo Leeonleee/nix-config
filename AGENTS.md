@@ -116,7 +116,6 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Replace generated hardware files from the target machine rather than treating them as normal shared modules.
 - `pkgsUnstable` is imported separately for Linux and Darwin with unfree packages allowed.
 - `modules/home/home-manager-unstable.nix` is a compatibility shim for Pi and Herdr modules missing from the Home Manager release branch.
-- OpenWhispr is Linux-only, its package path is explicitly `x86_64-linux`, and it is selected through `modules/home/profiles/linux-workstation.nix` rather than the shared Linux platform module.
 - DMS disables its Stylix target to retain its own theme and restarts its user service when Home Manager replaces `settings.json`.
 - Framework-specific Niri output names and lid events live in `hosts/framework/niri.nix`, so output changes should be checked on that machine.
 - A successful flake check currently emits a known Stylix warning that the KDE `qt` platform is not supported beyond `qtct`.
