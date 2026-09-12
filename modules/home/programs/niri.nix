@@ -185,7 +185,9 @@
     # -------------------------------------------------------------------------
 
     binds = {
-      "Mod+Shift+Slash".action.show-hotkey-overlay = [];
+      "Mod+Shift+Slash" = {
+        action.spawn = ["dms" "ipc" "call" "keybinds" "toggle" "niri"];
+      };
 
       "Mod+Return" = {
         hotkey-overlay.title = "Open a Terminal: kitty";
