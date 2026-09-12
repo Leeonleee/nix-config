@@ -468,6 +468,18 @@
       "Ctrl+Alt+Delete".action.quit = [];
 
       "Mod+Shift+P".action.power-off-monitors = [];
+
+      # DMS Binds
+      "Mod+P" = {
+        action.spawn = [
+          "dms"
+          "ipc"
+          "call"
+          "control-center"
+          "toggle"
+        ];
+      };
+      
     };
   };
 }
