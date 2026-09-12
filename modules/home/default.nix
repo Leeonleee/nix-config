@@ -1,9 +1,10 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
     ../theme.nix
     ./home-manager-unstable.nix
+    ./profiles/universal-apps.nix
     ./programs/zsh.nix
     ./programs/fastfetch.nix
     ./programs/neovim
@@ -20,14 +21,9 @@
   };
 
   home.packages = with pkgs; [
-    bitwarden-desktop
-    google-chrome
-    vscode
-
     lsof
     gh
     usbutils
-    
   ];
 
   home.stateVersion = "26.05";
@@ -45,6 +41,5 @@
     };
   };
 
-  programs.vesktop.enable = true;
   programs.home-manager.enable = true;
 }

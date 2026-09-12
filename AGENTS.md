@@ -34,7 +34,7 @@ Configured hosts:
     └── home/
         ├── default.nix               # Shared user packages and program imports
         ├── platforms/                # Linux and macOS user differences
-        ├── profiles/                 # Optional module groups, currently the Niri profile
+        ├── profiles/                 # Optional module groups for universal apps, general use, and Niri
         └── programs/                 # Per-program Home Manager modules and source configs
 ```
 
@@ -95,7 +95,9 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 
 ## COMMON CHANGE LOCATIONS
 
-- Add a package for every user in `modules/home/default.nix`.
+- Add universal command-line packages in `modules/home/default.nix`.
+- Add universal applications in `modules/home/profiles/universal-apps.nix`.
+- Add daily applications shared by the current hosts in `modules/home/profiles/general-use.nix`.
 - Add Linux-only packages or settings in `modules/home/platforms/linux.nix`.
 - Add macOS-only user settings in `modules/home/platforms/macos.nix`.
 - Add shared NixOS services in `modules/nixos/default.nix`.

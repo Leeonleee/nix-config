@@ -1,11 +1,11 @@
-{ pkgs, pkgsUnstable, config, ... }:
+{ config, inputs, pkgs, ... }:
 
 let
   wrappedPi = pkgs.symlinkJoin {
     name = "pi-coding-agent";
 
     paths = [
-      pkgsUnstable.pi-coding-agent
+      inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
     ];
 
     nativeBuildInputs = [

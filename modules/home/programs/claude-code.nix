@@ -1,9 +1,9 @@
-{ config, pkgsUnstable, ... }:
+{ config, inputs, pkgs, ... }:
 
 {
   programs.claude-code = {
     enable = true;
-    package = pkgsUnstable.claude-code;
+    package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code;
 
     settings = {
       attribution = {

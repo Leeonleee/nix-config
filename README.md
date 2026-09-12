@@ -98,16 +98,31 @@ Add `pkgsUnstable` to the module arguments, then prefix the package with `pkgsUn
 
 `pkgsUnstable` is already created and passed to all NixOS and Home Manager modules by `flake.nix`.
 
-### Host-specific package
+### Package scopes
 
-Packages in `modules/home/default.nix` are installed on every host. Each host also has a Home Manager module for device-specific packages:
+Add a package according to where it should be available:
 
-- `hosts/desktop/home.nix`
-- `hosts/framework/home.nix`
-- `hosts/dev-nix/home.nix`
-- `hosts/mac/home.nix`
+| Scope | File | Example |
+| --- | --- | --- |
+| Universal CLI tools | `modules/home/default.nix` | `gh`, `lsof` |
+| Universal graphical apps | `modules/home/profiles/universal-apps.nix` | Bitwarden, Chrome |
+| Daily apps used everywhere | `modules/home/profiles/general-use.nix` | VS Code, ChatGPT, Vesktop |
+| Platform-specific apps | `modules/home/platforms/linux.nix` or `macos.nix` | Linux-only tools |
+| One device only | `hosts/<device>/home.nix` | Claude Desktop on Framework |
+| Device-specific configuration | The same host file, or a module imported from it | App settings and services |
 
-Add a package to the relevant file without changing the universal package list:
+The host modules are imported automatically by `flake.nix`. The current hosts import `general-use.nix`; remove that profile from a host's `home.nix` if it should not receive those daily applications.
+
+Use the appropriate package source:
+
+```nix
+pkgs.package
+pkgsUnstable.package
+pkgsMaster.package
+inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.package
+```
+
+For a device-specific package, add it to the relevant host file:
 
 ```nix
 { pkgs, ... }:
@@ -118,8 +133,6 @@ Add a package to the relevant file without changing the universal package list:
   ];
 }
 ```
-
-The host modules are imported automatically by `flake.nix`. Leave `hosts/dev-nix/home.nix` empty when a headless host needs no additional packages.
 
 ### Check package availability on a system
 
