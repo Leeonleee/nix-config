@@ -4,7 +4,7 @@
 
 ## OVERVIEW
 
-This repository is Leon Lee's personal declarative system configuration for two x86_64 NixOS machines and one Apple Silicon macOS machine.
+This repository is Leon Lee's personal declarative system configuration for three x86_64 NixOS machines and one Apple Silicon macOS machine.
 It uses Nix flakes, NixOS, nix-darwin, Home Manager, and Stylix.
 The main package set tracks NixOS 26.05, while a separate unstable package set supplies selected newer tools.
 
@@ -14,6 +14,7 @@ Configured hosts:
 | --- | --- | --- |
 | `nixosConfigurations.desktop` | `x86_64-linux` | KDE Plasma desktop with NVIDIA configuration |
 | `nixosConfigurations.framework` | `x86_64-linux` | Framework laptop with KDE Plasma, Niri, DMS, fingerprint support, and Btrfs Docker storage |
+| `nixosConfigurations.dev-nix` | `x86_64-linux` | Headless development server |
 | `darwinConfigurations.mac` | `aarch64-darwin` | macOS with nix-darwin, Homebrew, and shared Home Manager configuration |
 
 ## STRUCTURE
@@ -23,9 +24,10 @@ Configured hosts:
 ├── flake.nix                         # Inputs, package sets, host factory, and outputs
 ├── flake.lock                        # Generated input pins
 ├── hosts/
-│   ├── desktop/                      # Desktop identity and generated hardware config
-│   ├── framework/                    # Framework-specific system, Niri, and hardware config
-│   └── mac/                          # macOS user and state version
+│   ├── desktop/                      # Desktop identity, hardware, and host-specific Home Manager config
+│   ├── framework/                    # Framework-specific system, Niri, hardware, and Home Manager config
+│   ├── dev-nix/                      # Headless server identity, hardware, and Home Manager config
+│   └── mac/                          # macOS user, state version, and Home Manager config
 └── modules/
     ├── nixos/                        # Shared Linux system services and Stylix theme
     ├── darwin/                       # Shared macOS system and Homebrew settings
@@ -37,11 +39,10 @@ Configured hosts:
 ```
 
 `flake.nix` is the composition root.
-Its `mkHost` helper builds both Linux configurations and gives modules access to `inputs` and `pkgsUnstable` through `specialArgs`.
+Its `mkHost` helper builds the Linux configurations and passes package sets to Home Manager through `home-manager.extraSpecialArgs`.
 The macOS output is composed separately because it uses `aarch64-darwin` and nix-darwin.
 
-All hosts import the shared Home Manager module in `modules/home/default.nix` plus one platform module.
-Only `framework` adds `modules/home/profiles/niri.nix`, which imports the Niri and Dank Material Shell modules.
+All hosts import the shared Home Manager module in `modules/home/default.nix`, one platform module, and `hosts/<name>/home.nix`. The host Home Manager modules are the place for device-specific packages and settings; shared packages remain in `modules/home/default.nix`. Only `framework` adds `modules/home/profiles/niri.nix`, which imports the Niri and Dank Material Shell modules.
 
 ## COMMANDS
 
@@ -103,7 +104,8 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Change Niri layout, outputs, input, rules, or keybindings in `modules/home/programs/niri.nix`.
 - Change DMS settings in `modules/home/programs/dms.nix`.
 - Change shared shell aliases in `modules/home/programs/zsh.nix`.
-- Add a host by creating `hosts/<name>/`, supplying its hardware configuration, and adding a flake output in `flake.nix`.
+- Add a host by creating `hosts/<name>/`, supplying its hardware configuration and `home.nix`, and adding a flake output in `flake.nix`.
+- Add device-specific Home Manager packages in `hosts/<name>/home.nix`; leave the file empty when the host needs only the universal packages.
 
 ## NOTES AND GOTCHAS
 

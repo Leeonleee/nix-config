@@ -102,9 +102,12 @@
                 inherit inputs pkgsUnstable pkgsMaster;
               };
 
+              # Packages shared by every host live in ./modules/home.
+              # Host-specific Home Manager settings live in ./hosts/<hostname>/home.nix.
               home-manager.users.leonl.imports = [
                 ./modules/home
                 ./modules/home/platforms/linux.nix
+                ./hosts/${hostname}/home.nix
               ]
               ++ homeModules;
             }
@@ -163,6 +166,7 @@
               stylix.homeModules.stylix
               ./modules/home
               ./modules/home/platforms/macos.nix
+              ./hosts/mac/home.nix
             ];
           }
         ];

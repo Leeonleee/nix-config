@@ -98,6 +98,29 @@ Add `pkgsUnstable` to the module arguments, then prefix the package with `pkgsUn
 
 `pkgsUnstable` is already created and passed to all NixOS and Home Manager modules by `flake.nix`.
 
+### Host-specific package
+
+Packages in `modules/home/default.nix` are installed on every host. Each host also has a Home Manager module for device-specific packages:
+
+- `hosts/desktop/home.nix`
+- `hosts/framework/home.nix`
+- `hosts/dev-nix/home.nix`
+- `hosts/mac/home.nix`
+
+Add a package to the relevant file without changing the universal package list:
+
+```nix
+{ pkgs, ... }:
+
+{
+  home.packages = with pkgs; [
+    example-package
+  ];
+}
+```
+
+The host modules are imported automatically by `flake.nix`. Leave `hosts/dev-nix/home.nix` empty when a headless host needs no additional packages.
+
 ### Check package availability on a system
 
 To check whether any package exists in the `nixpkgs-master` package set for a specific system, run this from the repository root. Replace the two `--argstr` values as needed:
