@@ -100,6 +100,19 @@ Add `pkgsUnstable` to the module arguments, then prefix the package with `pkgsUn
 
 `pkgsUnstable` is already created and passed to all NixOS and Home Manager modules by `flake.nix`.
 
+### Voxtype
+
+On `desktop` and `framework`, Home Manager manages Voxtype's configuration and
+user service in `modules/home/programs/voxtype.nix`. Hold **Right Alt** to record;
+release it to transcribe into the focused application. This reserves Right Alt
+for dictation rather than AltGr. The service starts with the graphical session.
+
+Download the English model once per machine with `voxtype setup --download --model base.en`,
+then run `systemctl --user restart voxtype`. Models remain in
+`~/.local/share/voxtype/models`. Do not run `voxtype setup systemd` or
+`voxtype configure`; edit the Nix module and rebuild instead.
+Check failures with `journalctl --user -u voxtype -b`.
+
 ### Package scopes
 
 Add a package according to where it should be available:
@@ -109,7 +122,7 @@ Add a package according to where it should be available:
 | Universal CLI tools | `modules/home/default.nix` | `gh`, `lsof` |
 | Universal graphical apps | `modules/home/profiles/universal-apps.nix` | Bitwarden, Chrome |
 | Daily apps for graphical hosts | `modules/home/profiles/general-use.nix` | VS Code, ChatGPT, Vesktop |
-| Linux workstation apps | `modules/home/profiles/linux-workstation.nix` | Kate |
+| Linux workstation apps | `modules/home/profiles/linux-workstation.nix` | Kate, Voxtype (Linux-only) |
 | OS-specific settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |
 | One device only | `hosts/<device>/home.nix` | Claude Desktop on Framework |
 | Device-specific configuration | The same host file, or a module imported from it | App settings and services |
