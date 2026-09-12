@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -8,7 +8,6 @@
     ./programs/zsh.nix
     ./programs/fastfetch.nix
     ./programs/neovim
-    ./programs/kitty.nix
     ./programs/starship
     ./programs/eza.nix
     ./programs/herdr.nix
@@ -25,8 +24,6 @@
     gh
     usbutils
   ];
-
-  home.stateVersion = "26.05";
 
   programs.git = {
     enable = true;

@@ -1,6 +1,8 @@
 { pkgs, pkgsUnstable, pkgsMaster, ... }:
 
 {
+  home.stateVersion = "26.05";
+
   imports = [
     ../../modules/home/profiles/general-use.nix
   ];

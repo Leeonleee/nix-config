@@ -4,10 +4,13 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/nixos
+    ../../modules/nixos/workstation.nix
   ];
 
   networking.hostName = "desktop";
-  
+
+  system.stateVersion = "26.05";
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 

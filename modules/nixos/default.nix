@@ -1,10 +1,11 @@
 { pkgs, ... }:
 
 {
+  # Baseline services shared by every Linux host. Workstation-only features
+  # live in workstation.nix and are imported by graphical hosts.
   imports = [
     ../theme.nix
   ];
-
 
   nix.settings.experimental-features = [
     "nix-command"
@@ -12,12 +13,6 @@
   ];
 
   networking.networkmanager.enable = true;
-
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
-
-  # OpenWhispr uses uinput to auto-paste into native Wayland applications.
-  hardware.uinput.enable = true;
 
   time.timeZone = "Australia/Sydney";
 
@@ -34,27 +29,7 @@
     LC_TIME = "en_AU.UTF-8";
   };
 
-  services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-
   virtualisation.docker.enable = true;
-
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
-  services.printing.enable = true;
-
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
 
   services.tailscale.enable = true;
 
@@ -65,23 +40,12 @@
       "networkmanager"
       "wheel"
       "docker"
-      "ydotool"
-      "input"
-      "uinput"
     ];
     shell = pkgs.zsh;
   };
 
-  programs.firefox.enable = true;
   programs.zsh.enable = true;
   programs.nix-ld.enable = true;
 
-  programs.ydotool = {
-    enable = true;
-    group = "ydotool";
-  };
-
   nixpkgs.config.allowUnfree = true;
-
-  system.stateVersion = "26.05";
 }

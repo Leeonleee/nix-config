@@ -1,8 +1,12 @@
 { inputs, pkgs, ... }:
 
 {
+  home.stateVersion = "26.05";
+
   imports = [
     ../../modules/home/profiles/general-use.nix
+    ../../modules/home/profiles/linux-workstation.nix
+    ./niri.nix
   ];
 
   # Claude Desktop is available on Linux through llm-agents.nix.

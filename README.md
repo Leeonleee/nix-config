@@ -12,25 +12,27 @@ It uses a Nix flake so the system and user setup can be applied with one command
 | --- | --- |
 | `desktop` | KDE Plasma with NVIDIA graphics settings |
 | `framework` | KDE Plasma and Niri, the latest Linux kernel, fingerprint support, and Btrfs-backed Docker |
+| `dev-nix` | Headless-oriented development server with Docker and SSH |
 | `mac` | nix-darwin, Homebrew, and the shared Home Manager setup |
 
-Both Linux hosts share the main system setup: systemd-boot, NetworkManager, Bluetooth, PipeWire, printing, Docker, Tailscale, Firefox, Zsh, Australian locale settings, and the Catppuccin Frappé theme.
+All Linux hosts share the baseline system setup: NetworkManager, Docker, Tailscale, Zsh, Australian locale settings, and the Catppuccin Frappé theme.
+The desktop and Framework hosts additionally enable the graphical workstation stack; `dev-nix` does not.
 
 Home Manager configures `leonl` on Linux and `leonlee` on macOS.
-It installs desktop applications and manages tools including Git, Zsh, Neovim, Kitty, Starship, eza, fastfetch, pi, and herdr.
-The Framework host also gets the Niri and Dank Material Shell configuration.
+Shared defaults provide CLI and development tools, while universal applications and selected general-use applications are layered separately.
+The Framework host also gets the Niri, Dank Material Shell, and Claude Desktop configuration.
 
 ## Repository layout
 
 - `flake.nix` - inputs, stable and unstable package sources, and host definitions.
 - `flake.lock` - pins all inputs to exact versions.
 - `hosts/<name>/` - machine identity, hardware configuration, and host-specific settings.
-- `modules/nixos/` - shared NixOS settings and the Stylix theme.
+- `modules/nixos/` - shared NixOS baseline settings and graphical workstation settings.
 - `modules/darwin/` - shared nix-darwin settings.
 - `modules/home/default.nix` - shared Home Manager settings and user packages.
 - `modules/home/platforms/` - Linux and macOS Home Manager settings.
 - `modules/home/programs/` - configuration for individual programs.
-- `modules/home/profiles/` - optional groups of Home Manager modules, such as Niri.
+- `modules/home/profiles/` - optional Home Manager groups for universal apps, general-use apps, Linux workstation apps, and Niri.
 
 The stable package source is the NixOS `26.05` branch. `nixpkgs-unstable` is also available for packages that need a newer version.
 
@@ -45,7 +47,7 @@ sudo nixos-rebuild test --flake .#framework --option experimental-features "nix-
 sudo nixos-rebuild switch --flake .#framework --option experimental-features "nix-command flakes"
 ```
 
-Replace `framework` with `desktop` when applying the desktop configuration. `test` activates the configuration until reboot; `switch` makes it the active boot configuration.
+Replace `framework` with `desktop` or `dev-nix` when applying another NixOS configuration. `test` activates the configuration until reboot; `switch` makes it the active boot configuration.
 
 After the first successful switch, flakes are enabled and these Zsh aliases are available:
 
@@ -61,8 +63,8 @@ For a new computer, create a new directory under `hosts/`, use that computer's g
 
 ## Add packages
 
-Add normal applications and command-line tools to `home.packages` in `modules/home/default.nix`.
-These packages are installed for both Home Manager users.
+Use the [package scopes](#package-scopes) below to decide where a Home Manager package belongs.
+Universal command-line packages remain in `modules/home/default.nix`.
 
 ### Stable package
 
@@ -106,12 +108,13 @@ Add a package according to where it should be available:
 | --- | --- | --- |
 | Universal CLI tools | `modules/home/default.nix` | `gh`, `lsof` |
 | Universal graphical apps | `modules/home/profiles/universal-apps.nix` | Bitwarden, Chrome |
-| Daily apps used everywhere | `modules/home/profiles/general-use.nix` | VS Code, ChatGPT, Vesktop |
-| Platform-specific apps | `modules/home/platforms/linux.nix` or `macos.nix` | Linux-only tools |
+| Daily apps for graphical hosts | `modules/home/profiles/general-use.nix` | VS Code, ChatGPT, Vesktop |
+| Linux workstation apps | `modules/home/profiles/linux-workstation.nix` | Kate, OpenWhispr |
+| OS-specific settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |
 | One device only | `hosts/<device>/home.nix` | Claude Desktop on Framework |
 | Device-specific configuration | The same host file, or a module imported from it | App settings and services |
 
-The host modules are imported automatically by `flake.nix`. The current hosts import `general-use.nix`; remove that profile from a host's `home.nix` if it should not receive those daily applications.
+The host modules are imported automatically by `flake.nix`. `desktop`, `framework`, and `mac` import `general-use.nix`; `dev-nix` intentionally does not, so it avoids those graphical applications.
 
 Use the appropriate package source:
 

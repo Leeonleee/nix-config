@@ -29,12 +29,12 @@ Configured hosts:
 │   ├── dev-nix/                      # Headless server identity, hardware, and Home Manager config
 │   └── mac/                          # macOS user, state version, and Home Manager config
 └── modules/
-    ├── nixos/                        # Shared Linux system services and Stylix theme
+    ├── nixos/                        # Shared Linux baseline and workstation system services
     ├── darwin/                       # Shared macOS system and Homebrew settings
     └── home/
         ├── default.nix               # Shared user packages and program imports
         ├── platforms/                # Linux and macOS user differences
-        ├── profiles/                 # Optional module groups for universal apps, general use, and Niri
+        ├── profiles/                 # Optional groups for universal, general-use, Linux workstation, and Niri settings
         └── programs/                 # Per-program Home Manager modules and source configs
 ```
 
@@ -42,7 +42,7 @@ Configured hosts:
 Its `mkHost` helper builds the Linux configurations and passes package sets to Home Manager through `home-manager.extraSpecialArgs`.
 The macOS output is composed separately because it uses `aarch64-darwin` and nix-darwin.
 
-All hosts import the shared Home Manager module in `modules/home/default.nix`, one platform module, and `hosts/<name>/home.nix`. The host Home Manager modules are the place for device-specific packages and settings; shared packages remain in `modules/home/default.nix`. Only `framework` adds `modules/home/profiles/niri.nix`, which imports the Niri and Dank Material Shell modules.
+All hosts import the shared Home Manager module in `modules/home/default.nix`, one platform module, and `hosts/<name>/home.nix`. Universal applications are imported by the shared module; general-use applications are selected by graphical hosts, Linux workstation applications are selected by the desktop and Framework hosts, and device-specific packages/settings live in each host's Home Manager module. Only `framework` adds `modules/home/profiles/niri.nix`, which imports the Niri and Dank Material Shell modules.
 
 ## COMMANDS
 
@@ -54,9 +54,9 @@ On a machine where flakes have not yet been enabled system-wide, include the exp
 | Validate every configuration without building | `nix --extra-experimental-features "nix-command flakes" flake check --no-build` |
 | Inspect outputs | `nix --extra-experimental-features "nix-command flakes" flake show --all-systems` |
 | Update and repin all inputs | `nix --extra-experimental-features "nix-command flakes" flake update` |
-| Build NixOS | `sudo nixos-rebuild build --flake .#<desktop-or-framework> --option experimental-features "nix-command flakes"` |
-| Temporarily activate NixOS | `sudo nixos-rebuild test --flake .#<desktop-or-framework> --option experimental-features "nix-command flakes"` |
-| Apply NixOS | `sudo nixos-rebuild switch --flake .#<desktop-or-framework> --option experimental-features "nix-command flakes"` |
+| Build NixOS | `sudo nixos-rebuild build --flake .#<desktop-framework-or-dev-nix> --option experimental-features "nix-command flakes"` |
+| Temporarily activate NixOS | `sudo nixos-rebuild test --flake .#<desktop-framework-or-dev-nix> --option experimental-features "nix-command flakes"` |
+| Apply NixOS | `sudo nixos-rebuild switch --flake .#<desktop-framework-or-dev-nix> --option experimental-features "nix-command flakes"` |
 | Build macOS | `darwin-rebuild build --flake .#mac` |
 | Check macOS activation | `sudo darwin-rebuild check --flake .#mac` |
 | Apply macOS | `sudo darwin-rebuild switch --flake .#mac` |
@@ -83,7 +83,7 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Keep comments for non-obvious operational constraints, such as portal selection, DMS restart behavior, or application compatibility.
 - No Nix formatter, linter, or flake `formatter` output is currently configured.
 - Do not hand-edit `flake.lock`.
-- Do not casually change `system.stateVersion` or `home.stateVersion`; these are compatibility versions, not release selectors.
+- Do not casually change `system.stateVersion` or `home.stateVersion`; these are compatibility versions, not release selectors. They are kept in each host's system and Home Manager modules rather than in shared modules.
 
 ### Lua and TOML
 
@@ -98,26 +98,26 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Add universal command-line packages in `modules/home/default.nix`.
 - Add universal applications in `modules/home/profiles/universal-apps.nix`.
 - Add daily applications shared by the current hosts in `modules/home/profiles/general-use.nix`.
-- Add Linux-only packages or settings in `modules/home/platforms/linux.nix`.
-- Add macOS-only user settings in `modules/home/platforms/macos.nix`.
-- Add shared NixOS services in `modules/nixos/default.nix`.
+- Keep Linux/macOS user differences in `modules/home/platforms/linux.nix` and `macos.nix`; do not put workstation classification there.
+- Add Linux graphical user applications in `modules/home/profiles/linux-workstation.nix`.
+- Add shared NixOS baseline services in `modules/nixos/default.nix` and graphical workstation services in `modules/nixos/workstation.nix`.
 - Add machine-specific settings in `hosts/<name>/default.nix`.
-- Change the global NixOS Stylix scheme or font in `modules/nixos/theme.nix`.
-- Change Niri layout, outputs, input, rules, or keybindings in `modules/home/programs/niri.nix`.
+- Change the global NixOS Stylix scheme or font in `modules/theme.nix`.
+- Change shared Niri layout, input, rules, or keybindings in `modules/home/programs/niri.nix`; change Framework-specific outputs and lid handling in `hosts/framework/niri.nix`.
 - Change DMS settings in `modules/home/programs/dms.nix`.
 - Change shared shell aliases in `modules/home/programs/zsh.nix`.
-- Add a host by creating `hosts/<name>/`, supplying its hardware configuration and `home.nix`, and adding a flake output in `flake.nix`.
+- Add a host by creating `hosts/<name>/`, supplying its hardware configuration, system state version, and `home.nix` with its Home Manager state version, and adding a flake output in `flake.nix`.
 - Add device-specific Home Manager packages in `hosts/<name>/home.nix`; leave the file empty when the host needs only the universal packages.
 
 ## NOTES AND GOTCHAS
 
 - Usernames and home directories are intentionally hard-coded as `leonl` on Linux and `leonlee` on macOS.
-- The two `hardware-configuration.nix` files are generated by `nixos-generate-config` and contain machine-specific filesystem UUIDs.
+- The three `hardware-configuration.nix` files are generated by `nixos-generate-config` and contain machine-specific filesystem UUIDs.
 - Replace generated hardware files from the target machine rather than treating them as normal shared modules.
 - `pkgsUnstable` is imported separately for Linux and Darwin with unfree packages allowed.
 - `modules/home/home-manager-unstable.nix` is a compatibility shim for Pi and Herdr modules missing from the Home Manager release branch.
-- OpenWhispr is Linux-only and its package path is explicitly `x86_64-linux`.
+- OpenWhispr is Linux-only, its package path is explicitly `x86_64-linux`, and it is selected through `modules/home/profiles/linux-workstation.nix` rather than the shared Linux platform module.
 - DMS disables its Stylix target to retain its own theme and restarts its user service when Home Manager replaces `settings.json`.
-- The Framework output names several physical display connectors in the Niri configuration, so output changes should be checked on that machine.
+- Framework-specific Niri output names and lid events live in `hosts/framework/niri.nix`, so output changes should be checked on that machine.
 - A successful flake check currently emits a known Stylix warning that the KDE `qt` platform is not supported beyond `qtct`.
 - The README is the human-facing setup guide and should stay consistent with host names, package sources, and rebuild commands.

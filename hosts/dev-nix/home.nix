@@ -1,9 +1,7 @@
 { pkgs, pkgsUnstable, pkgsMaster, ... }:
 
 {
-  imports = [
-    ../../modules/home/profiles/general-use.nix
-  ];
+  home.stateVersion = "26.05";
 
   # Keep this host headless by adding only dev-nix-specific packages here.
   # home.packages = [

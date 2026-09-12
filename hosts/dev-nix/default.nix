@@ -8,6 +8,8 @@
 
   networking.hostName = "dev-nix";
 
+  system.stateVersion = "26.05";
+
   boot.loader.systemd-boot.enable = false;
   boot.loader.efi.canTouchEfiVariables = false;
 
