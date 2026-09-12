@@ -113,6 +113,11 @@ then run `systemctl --user restart voxtype`. Models remain in
 `voxtype configure`; edit the Nix module and rebuild instead.
 Check failures with `journalctl --user -u voxtype -b`.
 
+On Framework, the DMS bar includes a Voxtype status widget showing Ready,
+Recording, Transcribing, or Stopped. Its source is in
+`modules/home/programs/dms-voxtype/`; Home Manager installs and enables it.
+After widget-only changes, restart DMS with `systemctl --user restart dms`.
+
 ### Package scopes
 
 Add a package according to where it should be available:

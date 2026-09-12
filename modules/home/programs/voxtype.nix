@@ -8,10 +8,15 @@ let
       modifiers = [];
       mode = "push_to_talk";
     };
-    audio.device = "default";
+    audio = {
+      device = "default";
+      sample_rate = 16000;
+      max_duration_secs = 60;
+    };
     whisper = {
       model = "base.en";
       language = "en";
+      translate = false;
     };
     output = {
       mode = "type";
@@ -19,6 +24,12 @@ let
       fallback_to_clipboard = true;
       wait_for_modifier_release = true;
       auto_submit = false;
+      type_delay_ms = 0;
+      notification = {
+        on_recording_start = false;
+        on_recording_stop = false;
+        on_transcription = false;
+      };
     };
   };
   configFile = (pkgs.formats.toml {}).generate "voxtype-config.toml" settings;

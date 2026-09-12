@@ -13,6 +13,14 @@
    programs.dank-material-shell = {
      enable = true;
      systemd.enable = true;
+     # Generate plugin enablement even when the plugin has no custom settings.
+     managePluginSettings = true;
+     plugins.voxtypeStatus.src = pkgs.runCommand "dms-voxtype-status" {} ''
+       mkdir -p "$out"
+       cp ${./dms-voxtype/plugin.json} "$out/plugin.json"
+       substitute ${./dms-voxtype/Widget.qml} "$out/Widget.qml" \
+         --replace-fail '@voxtype@' '${pkgs.voxtype}/bin/voxtype'
+     '';
      session.wallpaperPath = "${../../../assets/wallpapers/lavender-cat.png}";
       
      # Migrated from the old DMS configVersion 13 settings file to the current
@@ -89,6 +97,7 @@
            ];
 
            rightWidgets = [
+             "voxtypeStatus"
              "systemTray"
              "clipboard"
              "cpuUsage"
