@@ -1,8 +1,8 @@
-{ inputs, pkgsUnstable, pkgsMaster, ... }:
+{ inputs, pkgs, ... }:
 {
   programs.herdr = {
     enable = true;
-    package = pkgsMaster.herdr;
+    package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr;
 
     settings = {
       onboarding = false;
