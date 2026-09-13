@@ -195,6 +195,11 @@
       };
 
       "Mod+Space" = {
+        hotkey-overlay.title = "Open Vicinae";
+        action.spawn = [ "vicinae" "toggle" ];
+      };
+
+      "Mod+Shift+Space" = {
         hotkey-overlay.title = "Run an Application: fuzzel";
         action.spawn = "fuzzel";
       };
