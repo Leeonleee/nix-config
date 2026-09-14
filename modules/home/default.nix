@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgsUnstable, ... }:
 
 {
   imports = [
@@ -23,6 +23,7 @@
     lsof
     gh
     usbutils
+    pkgsUnstable.llama-cpp
   ];
 
   programs.git = {
