@@ -7,6 +7,8 @@
     ../programs/vicinae.nix
   ];
 
+  services.trayscale.enable = true;
+
   home.packages = with pkgs; [
     kdePackages.kate
   ];
