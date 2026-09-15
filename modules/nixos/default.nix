@@ -12,6 +12,13 @@
     "flakes"
   ];
 
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 7d";
+    persistent = true;
+  };
+
   networking.networkmanager.enable = true;
 
   time.timeZone = "Australia/Sydney";
