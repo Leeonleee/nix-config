@@ -16,5 +16,26 @@
     nodejs
     python3
     uv
+
+    jdk21
+    maven
+    gradle
+
+    gcc
+    gnumake
+    cmake
+    pkg-config
+    clang-tools
+    gdb
+
+    jq
+    ripgrep
+    fd
   ];
+
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
+  };
 }
