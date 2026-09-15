@@ -4,6 +4,7 @@
   home.stateVersion = "26.05";
 
   imports = [
+    ../../modules/home/profiles/development.nix
     ../../modules/home/profiles/general-use.nix
   ];
 

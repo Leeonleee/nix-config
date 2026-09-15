@@ -1,6 +1,13 @@
-{ pkgs, ... }:
+{ lib, pkgs, pkgsUnstable, ... }:
 
 {
+  imports = [
+    ../home-manager-unstable.nix
+    ../programs/herdr.nix
+    ../programs/pi.nix
+    ../programs/claude-code.nix
+  ];
+
   # Convenient baseline toolchains for scripts and small projects. Keep
   # project-specific versions and dependencies in a flake or dev shell.
   home.packages = with pkgs; [
@@ -26,11 +33,12 @@
     cmake
     pkg-config
     clang-tools
-    gdb
-
-    jq
-    ripgrep
-    fd
+  ]
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    pkgs.gdb
+  ]
+  ++ [
+    pkgsUnstable.llama-cpp
   ];
 
   programs.direnv = {

@@ -6,35 +6,97 @@ It uses a Nix flake so the system and user setup can be applied with one command
 > The usernames, home directories, hardware settings, and some personal details are specific to `leonl` on Linux and `leonlee` on macOS.
 > Change them before using this configuration on another account or computer.
 
-## Hosts
+## Hosts and roles
 
-| Host | Main differences |
-| --- | --- |
-| `desktop` | KDE Plasma with NVIDIA graphics settings |
-| `framework` | KDE Plasma and Niri, the latest Linux kernel, fingerprint support, and Btrfs-backed Docker |
-| `dev-nix` | Headless-oriented development server with Docker and SSH |
-| `mac` | nix-darwin, Homebrew, and the shared Home Manager setup |
+The flake keeps `mkHost` as the Linux composition helper. It wires the shared
+system and Home Manager modules and passes the native package sets through to
+Home Manager; it does not inject Home Manager profiles. Each host's
+`home.nix` explicitly selects its Home Manager roles.
 
-All Linux hosts share the baseline system setup: NetworkManager, Docker, Tailscale, Zsh, Australian locale settings, and the Catppuccin Frappé theme.
-The desktop and Framework hosts additionally enable the graphical workstation stack; `dev-nix` does not.
+| Host | NixOS or Darwin roles | Home Manager roles | Host-specific details |
+| --- | --- | --- | --- |
+| `desktop` | baseline, workstation, Niri, gaming, secure boot | development, general-use, Linux workstation, Niri | KDE Plasma and Niri, NVIDIA graphics, and the desktop monitor layout |
+| `framework` | baseline, workstation, Niri | development, general-use, Linux workstation, Niri | Framework laptop, latest Linux kernel, fingerprint support, Btrfs-backed Docker, lid handling, and monitor outputs |
+| `dev-nix` | baseline; headless SSH, Docker, and Tailscale host | development | No graphical workstation or Niri role |
+| `mac` | nix-darwin and Homebrew | development, general-use | Apple Silicon macOS with the shared Home Manager base |
 
-Home Manager configures `leonl` on Linux and `leonlee` on macOS.
-Shared defaults provide CLI and development tools, while universal applications and selected general-use applications are layered separately.
-The Framework host also gets the Niri, Dank Material Shell, and Claude Desktop configuration.
+The Linux baseline provides NetworkManager, Docker, Tailscale, Zsh,
+Australian locale settings, and the Catppuccin Frappé Stylix theme. The
+workstation role adds the shared graphical stack for `desktop` and `framework`.
+The separate gaming role currently owns Steam for `desktop`; future gaming
+additions such as GameMode, Gamescope, or MangoHud belong there as well. Secure
+boot is also desktop-specific.
+
+Niri has two layers:
+
+- `modules/nixos/niri.nix` contains shared system integration: the upstream
+  Niri and `nirinit` modules, the Niri overlay, portal and application-menu
+  setup, and the Dankshell PAM setting.
+- `modules/home/profiles/niri.nix` selects the shared Home Manager Niri/DMS
+  configuration. `modules/home/programs/niri.nix` contains the shared Niri
+  layout, input, rules, utilities, and keybindings.
+
+NVIDIA configuration remains in the desktop host. Framework laptop behavior,
+lid handling, and monitor outputs remain in Framework host files. The desktop
+and Framework monitor layouts are not shared defaults.
 
 ## Repository layout
 
-- `flake.nix` - inputs, stable and unstable package sources, and host definitions.
-- `flake.lock` - pins all inputs to exact versions.
-- `hosts/<name>/` - machine identity, hardware configuration, and host-specific settings.
-- `modules/nixos/` - shared NixOS baseline settings and graphical workstation settings.
+- `flake.nix` - inputs, native stable/unstable/master package sources, and host composition.
+- `flake.lock` - pins all inputs to exact versions; update it only with an intentional flake update.
+- `hosts/<name>/` - machine identity, generated hardware configuration, host-specific system settings, and Home Manager role selection.
+- `modules/nixos/` - shared baseline, workstation, Niri, gaming, and secure-boot system roles.
 - `modules/darwin/` - shared nix-darwin settings.
-- `modules/home/default.nix` - shared Home Manager settings and user packages.
-- `modules/home/platforms/` - Linux and macOS Home Manager settings.
-- `modules/home/programs/` - configuration for individual programs.
-- `modules/home/profiles/` - optional Home Manager groups for universal apps, general-use apps, Linux workstation apps, and Niri.
+- `modules/home/default.nix` - the minimal Home Manager base shared by every host.
+- `modules/home/platforms/` - Linux and macOS identity/platform differences.
+- `modules/home/profiles/` - host-selected Home Manager roles: development, general-use, Linux workstation, and Niri.
+- `modules/home/programs/` - configuration for individual programs used by the base or profiles.
 
-The stable package source is the NixOS `26.05` branch. `nixpkgs-unstable` is also available for packages that need a newer version.
+The stable package source is the NixOS `26.05` branch. `nixpkgs-unstable`
+and `nixpkgs-master` are also available. Linux uses `x86_64-linux` package
+sets and macOS uses native `aarch64-darwin` package sets.
+
+## Configuration mental model
+
+- **Host** = a specific machine.
+- **Profile** = a Home Manager role/capability that a host selects.
+- **Program** = configuration for an individual user application.
+- **Platform** = OS-specific Home Manager differences only.
+- **NixOS module** = a system-level role/capability.
+
+Home Manager is layered from the smallest shared base to increasingly
+specific host roles:
+
+| Layer | Selected by | What belongs there |
+| --- | --- | --- |
+| Minimal universal base | Every host, through `modules/home/default.nix` | Git, Zsh, Neovim/Nixvim, Starship, Eza, fastfetch, the Stylix theme, and small baseline CLI tools |
+| Development | `dev-nix`, `desktop`, `framework`, and `mac` | Toolchains, compilers, build tools, `direnv`, development CLIs, and coding-agent programs |
+| General-use | `desktop`, `framework`, and `mac` | Graphical daily applications such as Chrome, Bitwarden, VS Code, Kitty, and Vesktop |
+| Linux workstation | `desktop` and `framework` | Linux-only utilities such as Kate, Voxtype, Vicinae, and Trayscale |
+| Niri | `desktop` and `framework` | Niri/DMS configuration and session utilities such as Fuzzel, brightnessctl, playerctl, and wl-clipboard |
+| Host-specific | A single host | Hardware-dependent settings, layouts, services, and one-device packages |
+
+There is no universal-apps profile. Chrome and Bitwarden are general-use
+applications, not part of the universal base. Keep platform modules focused on
+OS/user identity differences rather than using them to classify a host.
+Niri configuration remains in one shared program module rather than being
+split into smaller files.
+
+### NixOS system roles
+
+| Role | Hosts | Examples |
+| --- | --- | --- |
+| Baseline | All Linux hosts | NetworkManager, Docker, Tailscale, user/Zsh setup, locale, and theme |
+| Workstation | `desktop`, `framework` | KDE Plasma/SDDM, Bluetooth, printing, PipeWire, and workstation input support |
+| Niri | `desktop`, `framework` | Niri package/module, `nirinit`, portal selection, application menu, and PAM integration |
+| Gaming | `desktop` | Steam; future GameMode, Gamescope, or MangoHud additions |
+| Secure boot | `desktop` | Lanzaboote and `sbctl` |
+
+Place host hardware and topology in the host instead of a shared role:
+NVIDIA drivers/settings belong to `hosts/desktop/default.nix`, the desktop
+Niri monitor layout belongs to `hosts/desktop/home.nix`, and Framework
+laptop/lid and monitor output settings belong to `hosts/framework/default.nix`
+and `hosts/framework/niri.nix`.
 
 ## Install or apply NixOS
 
@@ -59,24 +121,29 @@ rebuild        # Apply it permanently
 
 `rebuild-check` also works on macOS. It checks `~/nix-config` from any working directory and does not require sudo.
 
+The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`.
+Use the explicit command below until that alias is corrected:
+
+```sh
+sudo darwin-rebuild check --flake ~/nix-config#mac
+```
+
 For a new computer, create a new directory under `hosts/`, use that computer's generated `hardware-configuration.nix`, and add the host to `nixosConfigurations` in `flake.nix` before rebuilding.
 
 ## Add packages
 
-Use the [package scopes](#package-scopes) below to decide where a Home Manager package belongs.
-Universal command-line packages remain in `modules/home/default.nix`.
+Use the [package scopes](#package-scopes) below to decide where a Home Manager package belongs. Keep the universal base small: CLI essentials go in `modules/home/default.nix`, while toolchains and graphical applications belong in their selected profiles.
 
 ### Stable package
 
-Add the package name to `home.packages`:
+Add a package to the profile or host that owns its scope:
 
 ```nix
 { pkgs, ... }:
 
 {
   home.packages = with pkgs; [
-    bitwarden-desktop
-    firefox
+    example-package
   ];
 }
 ```
@@ -92,13 +159,13 @@ Add `pkgsUnstable` to the module arguments, then prefix the package with `pkgsUn
 
 {
   home.packages = with pkgs; [
-    bitwarden-desktop
+    stable-package
     pkgsUnstable.example-package
   ];
 }
 ```
 
-`pkgsUnstable` is already created and passed to all NixOS and Home Manager modules by `flake.nix`.
+`pkgsUnstable` and `pkgsMaster` are created as native Linux or Darwin package sets and passed to Home Manager by `flake.nix`.
 
 ### Voxtype
 
@@ -109,8 +176,7 @@ for dictation rather than AltGr. The service starts with the graphical session.
 
 Download the English model once per machine with `voxtype setup --download --model base.en`,
 then run `systemctl --user restart voxtype`. Models remain in
-`~/.local/share/voxtype/models`. Do not run `voxtype setup systemd` or
-`voxtype configure`; edit the Nix module and rebuild instead.
+`~/.local/share/voxtype/models`. Do not run `voxtype setup systemd` or `voxtype configure`; edit the Nix module and rebuild instead.
 Check failures with `journalctl --user -u voxtype -b`.
 
 On Framework, the DMS bar includes a Voxtype status widget showing Ready,
@@ -123,17 +189,17 @@ After widget-only changes, restart DMS with `systemctl --user restart dms`.
 
 Add a package according to where it should be available:
 
-| Scope | File | Example |
+| Scope | File | Examples |
 | --- | --- | --- |
-| Universal CLI tools | `modules/home/default.nix` | `gh`, `lsof` |
-| Universal graphical apps | `modules/home/profiles/universal-apps.nix` | Bitwarden, Chrome |
-| Daily apps for graphical hosts | `modules/home/profiles/general-use.nix` | VS Code, ChatGPT, Vesktop |
-| Linux workstation apps | `modules/home/profiles/linux-workstation.nix` | Kate, Voxtype (Linux-only) |
-| OS-specific settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |
+| Minimal universal CLI base | `modules/home/default.nix` | Git, `gh`, `lsof`, `jq`, `ripgrep`, `fd`, Linux `usbutils` |
+| Toolchains and development programs | `modules/home/profiles/development.nix` and its program imports | Go/Rust/Node/Python/JVM/C toolchains, `direnv`, Pi, Claude Code, Herdr |
+| Graphical general-use apps | `modules/home/profiles/general-use.nix` | Chrome, Bitwarden, VS Code, Kitty, Vesktop |
+| Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Voxtype, Vicinae, Trayscale |
+| Niri profile/program | `modules/home/profiles/niri.nix` and `modules/home/programs/niri.nix` | DMS, Fuzzel, brightnessctl, playerctl, wl-clipboard |
+| NixOS gaming | `modules/nixos/gaming.nix` | Steam; future GameMode, Gamescope, or MangoHud additions |
+| Host-only hardware/layout | `hosts/<device>/` | NVIDIA settings, desktop DP-4 layout, Framework lid and monitor outputs |
+| OS-specific user settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |
 | One device only | `hosts/<device>/home.nix` | Claude Desktop on Framework |
-| Device-specific configuration | The same host file, or a module imported from it | App settings and services |
-
-The host modules are imported automatically by `flake.nix`. `desktop`, `framework`, and `mac` import `general-use.nix`; `dev-nix` intentionally does not, so it avoids those graphical applications.
 
 Use the appropriate package source:
 
@@ -178,6 +244,21 @@ nix eval --impure --json \
 The result is `true` or `false`. This checks that the package attribute exists; test whether it actually builds with `nix build --impure --no-link` using the same package set.
 
 Apply package changes with `rebuild-test`, then `rebuild` when everything works.
+
+## Validate changes
+
+From the repository root, evaluate the flake and all three NixOS configurations,
+then explicitly evaluate macOS (not fully checked by `flake check`):
+
+```sh
+nix --extra-experimental-features "nix-command flakes" flake check --no-build
+nix --extra-experimental-features "nix-command flakes" eval --raw .#darwinConfigurations.mac.system.drvPath
+```
+
+These commands do not build or activate the systems. Test Linux changes on the
+matching host with `nixos-rebuild test` before switching; build/check macOS with
+`darwin-rebuild` on the Mac. New module files must be added to Git for a Git flake
+to include them.
 
 ## Update dependencies
 

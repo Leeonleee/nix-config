@@ -65,7 +65,6 @@
       nix-darwin,
       home-manager,
       stylix,
-      niri,
       lanzaboote,
       ...
     }:
@@ -96,7 +95,6 @@
         {
           hostname,
           extraModules ? [ ],
-          homeModules ? [ ],
         }:
         nixpkgs.lib.nixosSystem {
           inherit system;
@@ -126,8 +124,7 @@
                 ./modules/home
                 ./modules/home/platforms/linux.nix
                 ./hosts/${hostname}/home.nix
-              ]
-              ++ homeModules;
+              ];
             }
           ];
         };
@@ -139,29 +136,16 @@
 
           extraModules = [
             lanzaboote.nixosModules.lanzaboote
-            niri.nixosModules.niri
-          ];
-
-          homeModules = [
-            ./modules/home/profiles/niri.nix
           ];
         };
 
         framework = mkHost {
           hostname = "framework";
-
-          extraModules = [
-            niri.nixosModules.niri
-          ];
-
-          homeModules = [
-            ./modules/home/profiles/niri.nix
-          ];
         };
 
-	dev-nix = mkHost {
-	    hostname = "dev-nix";
-	};
+        dev-nix = mkHost {
+          hostname = "dev-nix";
+        };
 
       };
 

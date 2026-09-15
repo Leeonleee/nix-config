@@ -8,6 +8,8 @@
   # Daily-use applications for graphical hosts. Remove this profile from a
   # host's home.nix if that host should not receive these applications.
   home.packages = with pkgs; [
+    bitwarden-desktop
+    google-chrome
     vscode
     # inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.chatgpt
   ];
