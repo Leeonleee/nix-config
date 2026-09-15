@@ -194,12 +194,12 @@ Add a package according to where it should be available:
 | Minimal universal CLI base | `modules/home/default.nix` | Git, `gh`, `lsof`, `jq`, `ripgrep`, `fd`, Linux `usbutils` |
 | Toolchains and development programs | `modules/home/profiles/development.nix` and its program imports | Go/Rust/Node/Python/JVM/C toolchains, `direnv`, Pi, Claude Code, Herdr |
 | Graphical general-use apps | `modules/home/profiles/general-use.nix` | Chrome, Bitwarden, VS Code, Kitty, Vesktop |
-| Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Voxtype, Vicinae, Trayscale |
+| Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Claude Desktop, Voxtype, Vicinae, Trayscale |
 | Niri profile/program | `modules/home/profiles/niri.nix` and `modules/home/programs/niri.nix` | DMS, Fuzzel, brightnessctl, playerctl, wl-clipboard |
 | NixOS gaming | `modules/nixos/gaming.nix` | Steam; future GameMode, Gamescope, or MangoHud additions |
 | Host-only hardware/layout | `hosts/<device>/` | NVIDIA settings, desktop DP-4 layout, Framework lid and monitor outputs |
 | OS-specific user settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |
-| One device only | `hosts/<device>/home.nix` | Claude Desktop on Framework |
+| One device only | `hosts/<device>/home.nix` | Packages needed on only that machine |
 
 Use the appropriate package source:
 
