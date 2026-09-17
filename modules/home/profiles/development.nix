@@ -33,6 +33,8 @@
     cmake
     pkg-config
     clang-tools
+
+    codecrafters-cli
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.gdb

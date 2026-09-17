@@ -201,6 +201,22 @@
           settings.workspace.library.__raw =
             ''vim.api.nvim_get_runtime_file("lua", true)'';
         };
+
+        servers.pyright.enable = true;
+        servers.nil_ls.enable = true;
+        servers.rust_analyzer = {
+          enable = true;
+          # Rust is already provided by the development profile.
+          installCargo = false;
+          installRustc = false;
+        };
+        servers.gopls.enable = true;
+        servers.clangd.enable = true;
+        servers.ts_ls.enable = true;
+        servers.bashls.enable = true;
+        servers.yamlls.enable = true;
+        servers.taplo.enable = true;
+        servers.marksman.enable = true;
       };
 
       telescope = {
