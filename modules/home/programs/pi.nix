@@ -24,10 +24,6 @@ in
 
     package = wrappedPi;
 
-    extraPackages = [
-      pkgs.nodejs_latest
-    ];
-
     settings = {
       defaultProvider = "openai-codex";
       defaultThinkingLevel = "medium";
