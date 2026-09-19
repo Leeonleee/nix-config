@@ -40,7 +40,7 @@
     pkgs.gdb
   ]
   ++ [
-    pkgsUnstable.llama-cpp
+    llama-cpp
   ];
 
   programs.direnv = {
