@@ -35,7 +35,7 @@ in
 
       packages = [
         "npm:pi-init"
-        "npm:pi-subagents"
+        "npm:@tintinweb/pi-subagents"
         "npm:pi-btw"
         "npm:pi-clear-screen"
         "npm:pi-simplify"
