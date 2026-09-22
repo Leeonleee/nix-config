@@ -3,6 +3,7 @@
 {
   programs.zsh = {
     enable = true;
+    enableCompletion = true;
 
     initContent = ''
     if [[ -x /opt/homebrew/bin/brew ]]; then
