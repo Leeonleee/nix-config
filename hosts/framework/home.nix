@@ -8,6 +8,7 @@
     ../../modules/home/profiles/general-use.nix
     ../../modules/home/profiles/linux-workstation.nix
     ../../modules/home/profiles/niri.nix
+    ../../modules/home/programs/easyeffects.nix
     ./niri.nix
   ];
 
