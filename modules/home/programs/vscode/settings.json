@@ -1,0 +1,93 @@
+{
+  "security.workspace.trust.untrustedFiles": "open",
+  "explorer.confirmDelete": false,
+  "editor.codeLens": false,
+  "editor.accessibilitySupport": "off",
+  "editor.bracketPairColorization.enabled": true,
+  "workbench.iconTheme": "catppuccin-frappe",
+  "editor.inlineSuggest.enabled": false,
+  "editor.rulers": [79, 120],
+  "editor.fontLigatures": true,
+  "python.terminal.activateEnvironment": true,
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
+    "yaml": false,
+    "python": false,
+    "php": false,
+    "jsx": false,
+    "javascript": false,
+    "typescript": false,
+    "tsx": false
+  },
+  "cSpell.languageSettings": [{}],
+  "terminal.integrated.gpuAcceleration": "off",
+  "[python]": {"editor.formatOnType": true},
+  "explorer.confirmDragAndDrop": false,
+  "github.copilot.editor.enableAutoCompletions": true,
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": ["-synctex=1", "-interaction=nonstopmode", "-file-line-error", "-pdf", "-outdir=%OUTDIR%", "%DOC%"],
+      "env": {}
+    },
+    {
+      "name": "xelatex",
+      "command": "xelatex",
+      "args": ["-synctex=1", "-interaction=nonstopmode", "-file-line-error", "%DOC%"],
+      "env": {}
+    },
+    {
+      "name": "pdflatex",
+      "command": "pdflatex",
+      "args": ["-synctex=1", "-interaction=nonstopmode", "-file-line-error", "%DOC%"],
+      "env": {}
+    },
+    {"name": "bibtex", "command": "bibtex", "args": ["%DOCFILE%"], "env": {}}
+  ],
+  "latex-workshop.latex.recipes": [
+    {"name": "pdfLaTeX", "tools": ["pdflatex"]},
+    {"name": "latexmk 🔃", "tools": ["latexmk"]},
+    {"name": "xelatex", "tools": ["xelatex"]},
+    {"name": "pdflatex ➞ bibtex ➞ pdflatex`×2", "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"]},
+    {"name": "xelatex ➞ bibtex ➞ xelatex`×2", "tools": ["xelatex", "bibtex", "xelatex", "xelatex"]}
+  ],
+  "vim.vimrc.enable": true,
+  "extensions.experimental.affinity": {"asvetliakov.vscode-neovim": 1},
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "diffEditor.ignoreTrimWhitespace": true,
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "redhat.telemetry.enabled": true,
+  "github.copilot.nextEditSuggestions.enabled": false,
+  "python.analysis.typeCheckingMode": "standard",
+  "remote.SSH.remotePlatform": {"framework": "linux", "dev": "linux"},
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "github.copilot.nextEditSuggestions.fixes": false,
+  "github.copilot.nextEditSuggestions.extendedRange": false,
+  "github.copilot.nextEditSuggestions.allowWhitespaceOnlyChanges": false,
+  "editor.inlineSuggest.edits.showLongDistanceHint": false,
+  "chat.mcp.gallery.enabled": true,
+  "git.openRepositoryInParentFolders": "never",
+  "terminal.integrated.initialHint": false,
+  "claudeCode.preferredLocation": "panel",
+  "yaml.disableSchemaDetection": [
+    "**/.github/workflows/*.yml",
+    "**/.github/workflows/*.yaml",
+    "**/.gitea/workflows/*.yml",
+    "**/.gitea/workflows/*.yaml",
+    "**/.forgejo/workflows/*.yml",
+    "**/.forgejo/workflows/*.yaml"
+  ],
+  "terminal.integrated.mouseWheelScrollSensitivity": 3,
+  "git.autofetch": true,
+  "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor",
+    "{git,gitlens,chat-editing-snapshot-text-model,copilot,git-graph,git-graph-3}:/**/*.qrc": "default",
+    "*.qrc": "qt-core.qrcEditor"
+  }
+}

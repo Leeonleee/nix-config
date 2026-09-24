@@ -11,7 +11,6 @@
     ./programs/lsy.nix
   ];
   stylix.targets = {
-    starship.enable = false;
     gtk.enable = false;
   };
 

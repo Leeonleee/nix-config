@@ -3,6 +3,7 @@
 {
   imports = [
     ../programs/kitty.nix
+    ../programs/vscode
   ];
 
   # Daily-use applications for graphical hosts. Remove this profile from a
@@ -10,7 +11,6 @@
   home.packages = with pkgs; [
     bitwarden-desktop
     google-chrome
-    vscode
     # inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.chatgpt
   ];
 
