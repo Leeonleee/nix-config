@@ -1,5 +1,6 @@
 """Pure backend tests: python -m unittest discover -s modules/home/programs/capture."""
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -21,6 +22,46 @@ class CaptureTests(unittest.TestCase):
         environment = patch.dict(os.environ, {"XDG_RUNTIME_DIR": self.temporary.name})
         environment.start()
         self.addCleanup(environment.stop)
+
+    def test_failed_status_query_is_quiet_and_preserves_diagnostics(self):
+        error = subprocess.CalledProcessError(1, "systemctl", stderr="Unit temporarily unavailable\n")
+        with patch.object(backend.sys, "argv", ["capture", "record", "status"]), \
+                patch.object(backend, "unit_properties", side_effect=error), \
+                patch.object(backend, "notify") as notify, \
+                patch.object(backend.sys, "stdout", new_callable=io.StringIO) as stdout, \
+                patch.object(backend.sys, "stderr", new_callable=io.StringIO) as stderr:
+            self.assertEqual(backend.entrypoint(), 1)
+            self.assertEqual(json.loads(stdout.getvalue()), {"state": "unavailable", "elapsed": 0})
+            self.assertIn("Unit temporarily unavailable", stderr.getvalue())
+            notify.assert_not_called()
+
+    def test_status_recovers_after_transient_query_failure(self):
+        with patch.object(backend.sys, "argv", ["capture", "record", "status"]), \
+                patch.object(backend, "unit_properties", side_effect=[
+                    subprocess.CalledProcessError(1, "systemctl"), {"ActiveState": "inactive"},
+                ]), \
+                patch.object(backend, "notify") as notify, \
+                patch.object(backend.sys, "stdout", new_callable=io.StringIO) as stdout, \
+                patch.object(backend.sys, "stderr", new_callable=io.StringIO):
+            self.assertEqual(backend.entrypoint(), 1)
+            self.assertEqual(backend.entrypoint(), 0)
+            states = [json.loads(line)["state"] for line in stdout.getvalue().splitlines()]
+            self.assertEqual(states, ["unavailable", "idle"])
+            notify.assert_not_called()
+
+    def test_user_action_query_errors_still_notify(self):
+        for action in ("toggle", "stop"):
+            with self.subTest(action=action), \
+                    patch.object(backend.sys, "argv", ["capture", "record", action]), \
+                    patch.object(backend, "unit_properties", side_effect=subprocess.CalledProcessError(
+                        1, "systemctl", stderr="Connection refused",
+                    )), \
+                    patch.object(backend, "notify") as notify, \
+                    patch.object(backend.sys, "stderr", new_callable=io.StringIO):
+                self.assertEqual(backend.entrypoint(), 1)
+                notify.assert_called_once()
+                self.assertEqual(notify.call_args.args[0], "Capture failed")
+                self.assertIn("Connection refused", notify.call_args.args[1])
 
     def test_stale_state_is_ignored(self):
         (backend.runtime() / "state.json").write_text(json.dumps({

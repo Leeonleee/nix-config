@@ -302,10 +302,25 @@ def main():
     return 0
 
 
-if __name__ == "__main__":
+def entrypoint():
     try:
-        sys.exit(main())
+        return main()
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
-        print(f"capture: {error}", file=sys.stderr)
-        notify("Capture failed", str(error), failure=True)
-        sys.exit(1)
+        detail = str(error)
+        stderr = getattr(error, "stderr", None)
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode(errors="replace")
+        if stderr and stderr.strip():
+            detail += ": " + stderr.strip()
+        print(f"capture: {detail}", file=sys.stderr)
+        if sys.argv[1:] == ["record", "status"]:
+            # A background poll can race systemd reload/activation. Unknown is
+            # not idle or a failed recording, and must never raise a toast.
+            print(json.dumps({"state": "unavailable", "elapsed": 0}))
+        else:
+            notify("Capture failed", detail, failure=True)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(entrypoint())

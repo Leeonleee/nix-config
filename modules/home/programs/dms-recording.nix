@@ -26,6 +26,7 @@ let
 
         property string currentState: "idle"
         property int elapsed: 0
+        property string lastStatusError: ""
         readonly property bool active: currentState === "starting"
             || currentState === "recording" || currentState === "stopping"
         readonly property string duration: String(Math.floor(elapsed / 60)).padStart(2, "0")
@@ -34,9 +35,11 @@ let
             : currentState === "recording" ? "Recording " + duration
             : currentState === "starting" ? "Starting…"
             : currentState === "stopping" ? "Stopping…"
-            : currentState === "failed" ? "Recording unavailable" : ""
+            : currentState === "failed" ? "Recording failed"
+            : currentState === "unavailable" ? "Recording status unavailable" : ""
         readonly property string statusIcon: currentState === "recording" && !stopProcess.running
-            ? "fiber_manual_record" : currentState === "failed" ? "videocam_off" : "hourglass_top"
+            ? "fiber_manual_record"
+            : (currentState === "failed" || currentState === "unavailable") ? "videocam_off" : "hourglass_top"
         readonly property color statusColor: currentState === "recording"
             ? "#ef4444" : Theme.surfaceVariantText
 
@@ -72,21 +75,34 @@ let
                 onStreamFinished: {
                     try {
                         const status = JSON.parse(text);
-                        if (!["idle", "starting", "recording", "stopping", "failed"].includes(status.state)
+                        if (!["idle", "starting", "recording", "stopping", "failed", "unavailable"].includes(status.state)
                                 || !Number.isInteger(status.elapsed) || status.elapsed < 0)
                             throw new Error("Invalid recording status");
                         root.elapsed = status.elapsed;
                         root.currentState = status.state;
+                        if (status.state !== "unavailable")
+                            root.lastStatusError = "";
                     } catch (error) {
                         root.elapsed = 0;
-                        root.currentState = "failed";
+                        root.currentState = "unavailable";
+                    }
+                }
+            }
+            stderr: StdioCollector {
+                onStreamFinished: {
+                    const detail = text.trim();
+                    // Retain the actual systemd error in DMS logs without
+                    // spamming the same diagnostic on every 500 ms poll.
+                    if (detail && detail !== root.lastStatusError) {
+                        console.warn("Capture status: " + detail);
+                        root.lastStatusError = detail;
                     }
                 }
             }
             onExited: (exitCode, exitStatus) => {
                 if (exitCode !== 0 || exitStatus !== 0) {
                     root.elapsed = 0;
-                    root.currentState = "failed";
+                    root.currentState = "unavailable";
                 }
             }
         }
