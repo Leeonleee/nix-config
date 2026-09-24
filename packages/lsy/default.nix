@@ -1,4 +1,4 @@
-{ lib, python3Packages }:
+{ lib, python3Packages, tmux }:
 
 python3Packages.buildPythonApplication {
   pname = "lsy";
@@ -7,6 +7,9 @@ python3Packages.buildPythonApplication {
   src = ./.;
 
   build-system = [ python3Packages.setuptools ];
+
+  # A private tmux server owns VM consoles, including detached sessions.
+  makeWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath [ tmux ]}" ];
 
   checkPhase = ''
     runHook preCheck

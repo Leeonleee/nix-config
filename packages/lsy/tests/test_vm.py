@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from lsy.cli import main
 from lsy.commands import vm
@@ -50,58 +50,68 @@ class VmTests(unittest.TestCase):
                 with patch.object(vm.shutil, "which", return_value="/bin/nix"), contextlib.redirect_stderr(io.StringIO()):
                     self.assertEqual(vm.run(argparse.Namespace(flake=checkout)), 1)
 
-    def exercise_run(self, build_code=0, interrupted=False, guest_code=0, stubborn=False):
-        with tempfile.TemporaryDirectory() as checkout:
+    def exercise_run(self, build_code=0, detach=True, startup=True):
+        with tempfile.TemporaryDirectory() as checkout, tempfile.TemporaryDirectory() as runtime:
             (Path(checkout) / "flake.nix").touch()
-            process = MagicMock()
-            process.__enter__.return_value = process
-            if stubborn:
-                process.wait.side_effect = [KeyboardInterrupt(), subprocess.TimeoutExpired("qemu", 5), 0]
-            else:
-                process.wait.side_effect = [KeyboardInterrupt(), 0] if interrupted else [guest_code]
-            with patch.object(vm.Path, "exists", return_value=True), patch.object(vm.os, "access", return_value=True):
-                with patch.object(vm.shutil, "which", return_value="/bin/nix"):
-                    with patch.object(vm.subprocess, "run", return_value=subprocess.CompletedProcess([], build_code)) as build:
-                        with patch.object(vm.subprocess, "Popen", return_value=process) as launch:
-                            with contextlib.redirect_stdout(io.StringIO()):
-                                code = vm.run(argparse.Namespace(flake=checkout))
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(patch.object(vm.Path, "exists", return_value=True))
+                stack.enter_context(patch.object(vm.os, "access", return_value=True))
+                stack.enter_context(patch.object(vm.shutil, "which", return_value="/bin/nix"))
+                stack.enter_context(patch.object(vm.session, "runtime_directory", return_value=Path(runtime)))
+                stack.enter_context(patch.object(vm.session, "cleanup"))
+                stack.enter_context(patch.object(vm.session, "has_session", side_effect=[False, startup, startup]))
+                stack.enter_context(patch.object(vm.session, "live_processes", side_effect=[[], [123, 456]]))
+                build = stack.enter_context(patch.object(vm.subprocess, "run", return_value=subprocess.CompletedProcess([], build_code)))
+                launch = stack.enter_context(patch.object(vm.session, "tmux", return_value=subprocess.CompletedProcess([], 0)))
+                attach = stack.enter_context(patch.object(vm, "attach", return_value=0))
+                stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+                stack.enter_context(contextlib.redirect_stderr(io.StringIO()))
+                code = vm.run(argparse.Namespace(flake=checkout, detach=detach))
             command = build.call_args.args[0]
             self.assertEqual(command[-6:], ["--argstr", "flakePath", checkout, "--argstr", "guestUser", "alice"])
             self.assertEqual(command[command.index("--expr") + 1], vm.RUNNER_EXPRESSION)
             self.assertIn("--impure", command)
-            runtime = Path(command[command.index("--out-link") + 1]).parent
-            self.assertFalse(runtime.exists(), "Temporary VM state must be cleaned up")
-            return code, launch, process, runtime
+            self.assertEqual(command[command.index("--out-link") + 1], str(Path(runtime) / "work/runner"))
+            return code, launch, attach
+
+    def test_duplicate_run_does_not_build(self):
+        with tempfile.TemporaryDirectory() as checkout, tempfile.TemporaryDirectory() as runtime:
+            (Path(checkout) / "flake.nix").touch()
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(patch.object(vm.Path, "exists", return_value=True))
+                stack.enter_context(patch.object(vm.os, "access", return_value=True))
+                stack.enter_context(patch.object(vm.shutil, "which", return_value="/bin/nix"))
+                stack.enter_context(patch.object(vm.session, "runtime_directory", return_value=Path(runtime)))
+                stack.enter_context(patch.object(vm.session, "has_session", return_value=True))
+                build = stack.enter_context(patch.object(vm.subprocess, "run"))
+                output = stack.enter_context(contextlib.redirect_stderr(io.StringIO()))
+                self.assertEqual(vm.run(argparse.Namespace(flake=checkout, detach=True)), 1)
+                self.assertIn("already running", output.getvalue())
+                build.assert_not_called()
 
     def test_build_failure_does_not_launch(self):
-        code, launch, _, _ = self.exercise_run(build_code=7)
+        code, launch, attach = self.exercise_run(build_code=7)
         self.assertEqual(code, 7)
         launch.assert_not_called()
+        attach.assert_not_called()
 
-    def test_success_and_cleanup(self):
-        code, launch, _, runtime = self.exercise_run()
+    def test_detached_launch(self):
+        code, launch, attach = self.exercise_run()
         self.assertEqual(code, 0)
-        launch.assert_called_once_with([str(runtime / "runner/bin/microvm-run")], cwd=str(runtime))
+        self.assertEqual(launch.call_args.args[1:5], ("new-session", "-d", "-s", "vm"))
+        self.assertIn("lsy.commands.vm_session", launch.call_args.args[-1])
+        self.assertIn("PYTHONPATH=", launch.call_args.args[-1])
+        attach.assert_not_called()
 
-    def test_guest_failure_is_returned(self):
-        code, _, _, _ = self.exercise_run(guest_code=3)
-        self.assertEqual(code, 3)
+    def test_default_attaches(self):
+        code, _, attach = self.exercise_run(detach=False)
+        self.assertEqual(code, 0)
+        attach.assert_called_once()
 
-    def test_each_run_gets_a_fresh_directory(self):
-        first = self.exercise_run()[3]
-        second = self.exercise_run()[3]
-        self.assertNotEqual(first, second)
-
-    def test_stubborn_guest_is_killed(self):
-        code, _, process, _ = self.exercise_run(stubborn=True)
-        self.assertEqual(code, 130)
-        process.terminate.assert_called_once()
-        process.kill.assert_called_once()
-
-    def test_interrupt_terminates_guest(self):
-        code, _, process, _ = self.exercise_run(interrupted=True)
-        self.assertEqual(code, 130)
-        process.terminate.assert_called_once()
+    def test_startup_failure(self):
+        code, _, attach = self.exercise_run(startup=False)
+        self.assertEqual(code, 1)
+        attach.assert_not_called()
 
 
 if __name__ == "__main__":

@@ -138,6 +138,10 @@ For a new computer, create a new directory under `hosts/`, use that computer's g
 lsy try cowsay       # Temporary package shell; exit to leave
 lsy vm run           # Fresh NixOS guest; sudo poweroff inside to leave
 lsy vm run --flake ~/nix-config
+lsy vm run --detach  # Start without attaching to the console
+lsy vm attach       # Rejoin; Ctrl-B then D detaches without stopping
+lsy vm status
+lsy vm stop         # Shut down and discard guest state
 ```
 
 `lsy vm run` uses `microvm.nix` with QEMU/KVM, user-mode networking, no host
