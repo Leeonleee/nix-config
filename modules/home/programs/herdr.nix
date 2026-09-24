@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ config, inputs, pkgs, ... }:
 {
   programs.herdr = {
     enable = true;
@@ -7,10 +7,30 @@
     settings = {
       onboarding = false;
       theme = {
-        name = "catppuccin";
-        auto_switch = true;
-        dark_name = "catppuccin";
-        light_name = "catppuccin-latte";
+        name = "terminal";
+        auto_switch = false;
+        # Herdr has no Stylix target; map its custom tokens to the shared palette.
+        custom = with config.lib.stylix.colors.withHashtag; {
+          accent = base0D;
+          panel_bg = base00;
+          sidebar_bg = base00;
+          active_row_bg = base01;
+          selection_bg = base02;
+          surface0 = base01;
+          surface1 = base02;
+          surface_dim = base01;
+          overlay0 = base03;
+          overlay1 = base04;
+          text = base05;
+          subtext0 = base04;
+          mauve = base0E;
+          green = base0B;
+          yellow = base0A;
+          red = base08;
+          blue = base0D;
+          teal = base0C;
+          peach = base09;
+        };
       };
       terminal = {
 

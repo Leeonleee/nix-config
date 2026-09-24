@@ -7,9 +7,8 @@
      inputs.dms.homeModules.niri
    ];
 
-   # Preserve the old DMS theme and font defaults instead of overriding them
-   # with the global Stylix theme.
-   stylix.targets.dank-material-shell.enable = false;
+   # Follow the shared palette and fonts while retaining the session wallpaper.
+   stylix.targets.dank-material-shell.enable = true;
 
    programs.dank-material-shell = {
      enable = true;

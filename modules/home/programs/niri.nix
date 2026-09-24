@@ -95,17 +95,17 @@
         enable = true;
         width = 4;
 
-        active.color = "#c37fffCC";
-        inactive.color = "#505050";
+        active.color = "${config.lib.stylix.colors.withHashtag.base0D}CC";
+        inactive.color = config.lib.stylix.colors.withHashtag.base03;
       };
 
       border = {
         enable = false;
         width = 4;
 
-        active.color = "#ffc87f";
-        inactive.color = "#505050";
-        urgent.color = "#9b0000";
+        active.color = config.lib.stylix.colors.withHashtag.base0D;
+        inactive.color = config.lib.stylix.colors.withHashtag.base03;
+        urgent.color = config.lib.stylix.colors.withHashtag.base08;
       };
 
       shadow = {

@@ -21,11 +21,16 @@ Home Manager; it does not inject Home Manager profiles. Each host's
 | `mac` | nix-darwin and Homebrew | development, general-use | Apple Silicon macOS with the shared Home Manager base |
 
 The Linux baseline provides NetworkManager, Docker, Tailscale, Zsh,
-Australian locale settings, and the Catppuccin Frappé Stylix theme. The
+Australian locale settings, and the shared Stylix theme from `modules/theme.nix`. The
 workstation role adds the shared graphical stack for `desktop` and `framework`.
 The separate gaming role currently owns Steam for `desktop`; future gaming
 additions such as GameMode, Gamescope, or MangoHud belong there as well. Secure
 boot is also desktop-specific.
+
+DMS follows Stylix through its built-in target while retaining its configured
+wallpaper. Herdr uses custom color tokens generated from the Stylix palette.
+Changing `modules/theme.nix` and rebuilding updates both; runtime theme
+auto-switching is disabled in Herdr so it follows the selected palette.
 
 Niri has two layers:
 
