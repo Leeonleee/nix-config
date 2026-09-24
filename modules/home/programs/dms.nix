@@ -98,18 +98,39 @@
            ];
 
            rightWidgets = [
-             "voxtypeStatus"
+             {
+               id = "voxtypeStatus";
+               enabled = true;
+             }
              {
                id = "systemTray";
                enabled = true;
                trayUseInlineExpansion = true;
              }
-             "clipboard"
-             "cpuUsage"
-             "memUsage"
-             "controlCenterButton"
-             "battery"
-             "notificationButton"
+             {
+               id = "clipboard";
+               enabled = true;
+             }
+             {
+               id = "cpuUsage";
+               enabled = false;
+             }
+             {
+               id = "memUsage";
+               enabled = false;
+             }
+             {
+               id = "controlCenterButton";
+               enabled = true;
+             }
+             {
+               id = "battery";
+               enabled = true;
+             }
+             {
+               id = "notificationButton";
+               enabled = true;
+             }
            ];
 
            spacing = 4;
