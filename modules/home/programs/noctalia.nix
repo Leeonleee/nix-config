@@ -171,9 +171,10 @@ in
         thickness = 38;
         padding = 8;
         widget_spacing = 6;
-        capsule = false;
+        # A square capsule behind each widget; spacers stay bare.
+        capsule = true;
         capsule_fill = "surface_variant";
-        capsule_radius = 6.0;
+        capsule_radius = 0.0;
         capsule_padding = 8.0;
 
         # Gaps separate the top widgets now that they have no capsules.
@@ -198,20 +199,28 @@ in
         };
         # DMS showWorkspaceName; names come from Hyprland's defaultName.
         workspaces = {
+          # One square box per workspace instead of a widget capsule around
+          # them all.
           capsule = false;
-          # Bare letters without pills.
-          style = "minimal";
-          # Workspace initials; full names do not fit a vertical bar.
+          style = "regular";
+          capsule_radius = 0.0;
+          # Match the control center's capsule: 29px across (0.76 of the 38px
+          # bar) and 32px long (16px glyph plus 8px padding each end). Pills
+          # are 16px * scale across and pill_size times that long; pill_scale
+          # tops out at 1.0, so the widget scale does the enlarging.
+          scale = 1.8125;
+          pill_scale = 1.0;
+          active_pill_size = 1.1;
+          inactive_pill_size = 1.1;
+          # Workspace initials; full names do not fit a vertical bar. The
+          # 11px label also grows with scale, so shrink it back to ~16px.
           label_source = "name";
           max_label_chars = 1;
-          # Larger pills and initials than the defaults (1.0).
-          pill_scale = 1.2;
-          font_scale = 1.2;
-          # Minimal style colours the letters themselves: the focused
-          # workspace is accented, occupied ones are brighter than the empty
-          # ones' on_surface_variant.
+          font_scale = 0.8;
+          # Quieter than the default secondary accent: highlight only the
+          # focused workspace.
           focused_color = "primary";
-          occupied_color = "on_surface";
+          occupied_color = "outline";
           empty_color = "surface_variant";
         };
         clock = {

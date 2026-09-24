@@ -29,6 +29,11 @@ let
             : currentState === "idle" ? "keyboard_voice" : "mic_off"
         readonly property color statusColor: currentState === "recording" ? Theme.error
             : currentState === "transcribing" ? Theme.primary : Theme.surfaceText
+        readonly property bool active: currentState === "recording" || currentState === "transcribing"
+
+        // Only shown while listening or transcribing.
+        onActiveChanged: setVisibilityOverride(active)
+        Component.onCompleted: setVisibilityOverride(active)
 
         // Poll the daemon-aware status command rather than trusting a stale state file.
         Timer {

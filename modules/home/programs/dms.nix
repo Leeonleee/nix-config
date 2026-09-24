@@ -1,5 +1,24 @@
-{ pkgs, inputs, ... }:
+{ config, pkgs, inputs, ... }:
 
+ let
+   colours = config.lib.stylix.colors.withHashtag;
+   spacer = {
+     id = "spacer";
+     enabled = true;
+     size = 4;
+   };
+   # The control center button with every status icon off shows a single
+   # settings icon; enable individual icons through `icons`.
+   controlCenterIconOnly = icons: {
+     id = "controlCenterButton";
+     enabled = true;
+     showNetworkIcon = false;
+     showVpnIcon = false;
+     showBluetoothIcon = false;
+     showAudioIcon = false;
+     showScreenSharingIcon = false;
+   } // icons;
+ in
  {
    imports = [
      ./dms-voxtype.nix
@@ -30,10 +49,13 @@
      # machine-specific keys have been omitted.
      settings = {
        wallpaperFillMode = "Fill";
-       cornerRadius = 0;
+       # Square bar, widget pills and workspace boxes everywhere.
+       radiusMode = "fixed";
+       fixedRadius = 0;
+       # Widget pills use the card surface; match Noctalia's surface_variant.
+       cardSurfaceColor = "surfaceVariant";
        barElevationEnabled = false;
        controlCenterShowMicPercent = true;
-       showWorkspaceName = true;
        appIdSubstitutions = [ ];
        appDrawerSectionViewModes.apps = "grid";
        networkPreference = "wifi";
@@ -65,19 +87,30 @@
            id = "default";
            name = "Main Bar";
            enabled = true;
-           position = 0;
+           # Left edge (0 top, 1 bottom, 2 left, 3 right).
+           position = 2;
            screenPreferences = [ "all" ];
            showOnLastDisplay = true;
 
+           # Mirrors the Noctalia bar in noctalia.nix. On a vertical bar the
+           # left, center and right lists are the top, middle and bottom.
+           # Spacers add to the 4px pill gap on each side, so size 4 is a
+           # ~12px gap.
            leftWidgets = [
-             {
-               id = "launcherButton";
-               enabled = true;
-             }
+             (controlCenterIconOnly { })
+             spacer
              {
                id = "workspaceSwitcher";
                enabled = true;
+               # Name initials; DMS truncates names on a vertical bar.
+               showWorkspaceName = true;
+               # Highlight only the focused workspace; occupied boxes use the
+               # outline colour, empty ones stay faint.
+               workspaceOccupiedColorMode = "custom";
+               workspaceOccupiedCustomColor = colours.base03;
              }
+             spacer
+             # Hidden while no media player exists.
              {
                id = "music";
                enabled = true;
@@ -86,16 +119,9 @@
 
            centerWidgets = [
              {
-               id = "weather";
-               enabled = true;
-             }
-             {
                id = "clock";
                enabled = true;
-             }
-             {
-               id = "focusedWindow";
-               enabled = true;
+               clockCompactMode = true;
              }
            ];
 
@@ -105,6 +131,7 @@
                enabled = true;
                trayUseInlineExpansion = true;
              }
+             # Shown only while active.
              {
                id = "voxtypeStatus";
                enabled = true;
@@ -113,38 +140,29 @@
                id = "recordingStatus";
                enabled = true;
              }
+             spacer
+             # DMS has no standalone volume widget: a second control center
+             # button showing only the audio icon scrolls the volume.
+             (controlCenterIconOnly { showAudioIcon = true; })
+             # Microphone (or camera/screen share) in use; hidden otherwise.
              {
-               id = "clipboard";
-               enabled = true;
-             }
-             {
-               id = "cpuUsage";
-               enabled = false;
-             }
-             {
-               id = "memUsage";
-               enabled = false;
-             }
-             {
-               id = "controlCenterButton";
+               id = "privacyIndicator";
                enabled = true;
              }
              {
                id = "battery";
                enabled = true;
              }
-             {
-               id = "notificationButton";
-               enabled = true;
-             }
            ];
 
-           spacing = 4;
-           innerPadding = 4;
+           # Floats 8px from the left edge and the top and bottom ends;
+           # innerPadding 2 gives the 38px Noctalia bar thickness.
+           spacing = 8;
+           innerPadding = 2;
            bottomGap = 0;
            transparency = 1;
            widgetTransparency = 1;
-           squareCorners = false;
+           squareCorners = true;
            noBackground = false;
            maximizeWidgetIcons = false;
            maximizeWidgetText = false;
