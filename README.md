@@ -47,7 +47,8 @@ and Framework monitor layouts are not shared defaults.
 
 ### Hyprland trial alongside Niri
 
-`desktop` and `framework` also offer Hyprland with Caelestia. Rebuild with
+`desktop` and `framework` also offer Hyprland with either the Caelestia or the
+Noctalia shell (see [Choosing the Hyprland shell](#choosing-the-hyprland-shell)). Rebuild with
 `sudo nixos-rebuild test --flake .#framework` (use `desktop` on the desktop),
 then log out and select **Hyprland** in SDDM's session selector. Do not launch it
 inside an existing Niri session. Select **Niri** at the next login to return;
@@ -57,7 +58,8 @@ Niri/DMS and KDE Plasma remain installed. Once tested, use
 `modules/nixos/hyprland.nix` only supplies system integration (the session,
 portal, and polkit support). The Home Manager profile
 `modules/home/profiles/hyprland.nix` imports `programs/hyprland.nix` for desktop
-settings and `programs/caelestia.nix` for the shell. Both layers use the stable
+settings and both shells: `programs/caelestia.nix`, and `programs/noctalia.nix`
+with `programs/noctalia-hyprland.nix`. Both layers use the stable
 Hyprland package; do not install a separate compositor version in Home Manager.
 Edit those Nix modules and rebuild rather than editing generated files under
 `~/.config/hypr` or installing an upstream dotfiles bundle.
@@ -69,8 +71,9 @@ persistent workspaces, and Niri-like animation speeds. The authoritative
 bindings are in `modules/home/programs/hyprland.nix`; press **Super+Shift+/**
 for a searchable, read-only list generated from them. Niri's keys map to their
 nearest Hyprland equivalents, including column moves, consume/expel, preset
-widths and centering. **Super+P** opens Caelestia's dashboard;
-**Super+Shift+Space** opens its launcher. Niri actions without an equivalent,
+widths and centering. **Super+P** opens Caelestia's dashboard or Noctalia's
+control center, and **Super+Alt+L** locks through the selected shell;
+**Super+Shift+Space** opens the system menu. Niri actions without an equivalent,
 including **Super+O** (overview), first/last column and window height presets,
 are intentionally unbound. Niri's DMS system menu documented below remains
 Niri-only; Hyprland screenshots use Grimblast instead. Monitor overrides live
@@ -79,7 +82,7 @@ while Framework retains eDP-1 at scale 1.5 and its dock connector positions.
 Framework's Hyprland lid handling, which turns eDP-1 off and on like Niri's,
 lives in `hosts/framework/hyprland.nix`.
 
-DMS is bound to `niri.service`, while Caelestia belongs to
+DMS is bound to `niri.service`, while the selected Hyprland shell belongs to
 `hyprland-session.target`; rebuilding outside Niri will not start DMS. Fully
 log out between sessions so their services and portal environment are replaced.
 Hyprland uses its own screencast portal and the KDE file chooser, without
@@ -91,6 +94,51 @@ no Caelestia target, `modules/home/programs/caelestia.nix` maps the palette to i
 Material colour roles. Home Manager owns `~/.config/caelestia/shell.json` and
 `~/.local/state/caelestia/scheme.json`; change the theme declaratively rather than
 using Caelestia's interactive scheme editor.
+
+#### Choosing the Hyprland shell
+
+One option in `modules/home/profiles/hyprland.nix` selects the shell:
+
+```nix
+desktop.hyprland.shell = "caelestia"; # or "noctalia"
+```
+
+Rebuild, then log out and back in to Hyprland. Both shells stay installed and
+configured; the option only selects which user service is wanted by
+`hyprland-session.target`, and which shell supplies the lock, **Super+P** and
+system-menu entries. A running Hyprland session switches shells on
+`nixos-rebuild switch`, because Home Manager stops the old unit and starts the
+new one. Niri always uses DMS.
+
+Noctalia v5 comes from the unstable package set and the Home Manager unstable
+module (through `modules/home/home-manager-unstable.nix`), with no additional
+flake input. `modules/home/programs/noctalia.nix` holds its compositor-independent
+settings, laid out like DMS: a full-width square top bar with the launcher,
+workspace names and media on the left; weather, clock and window title in the
+centre; and the tray drawer, Voxtype and recording indicators, clipboard,
+network, Bluetooth, volume, microphone, control center, battery and
+notifications on the right. `programs/noctalia-status.nix` ports the DMS Voxtype
+and recording widgets as a Nix-built Noctalia plugin. Stylix has no Noctalia v5
+target, so the module maps the Stylix palette to a custom Noctalia palette, as
+Stylix's v4 target does, and disables Noctalia's application templates. The
+build validates the generated `~/.config/noctalia/config.toml`.
+
+With Noctalia selected, Hyprland adds these bindings:
+
+| Shortcut | Action |
+| --- | --- |
+| **Super+Alt+L** | Lock screen |
+| **Super+P** | Control center |
+| **Super+N** | Notification history |
+| **Super+Alt+N** | Toggle Do Not Disturb |
+| **Super+Alt+V** | Clipboard history |
+| **Super+Alt+P** | Power menu |
+
+Volume, brightness, media, screenshot and recording keys are shared with
+Caelestia; Noctalia's OSD follows those changes. Changes made in Noctalia's
+settings window are saved to `~/.local/state/noctalia/settings.toml` and
+override the Nix configuration; delete that file to return to the declared
+settings.
 
 ## Repository layout
 
@@ -128,7 +176,7 @@ specific host roles:
 | General-use | `desktop`, `framework`, and `mac` | Graphical daily applications such as Chrome, Bitwarden, VS Code, Kitty, and Vesktop |
 | Linux workstation | `desktop` and `framework` | Linux-only utilities such as Kate, Voxtype, Vicinae, and Trayscale |
 | Niri | `desktop` and `framework` | Niri/DMS configuration and session utilities such as Fuzzel, brightnessctl, playerctl, and wl-clipboard |
-| Hyprland | `desktop` and `framework` | Trial Hyprland desktop and Caelestia shell |
+| Hyprland | `desktop` and `framework` | Trial Hyprland desktop with the Caelestia or Noctalia shell |
 | Host-specific | A single host | Hardware-dependent settings, layouts, services, and one-device packages |
 
 There is no universal-apps profile. Chrome and Bitwarden are general-use
@@ -392,7 +440,7 @@ Add a package according to where it should be available:
 | Graphical general-use apps | `modules/home/profiles/general-use.nix` | Chrome, Bitwarden, VS Code, Kitty, Vesktop |
 | Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Claude Desktop, Voxtype, Vicinae, Trayscale |
 | Niri profile/program | `modules/home/profiles/niri.nix` and `modules/home/programs/niri.nix` | DMS, Fuzzel, brightnessctl, playerctl, wl-clipboard |
-| Hyprland profile/program | `modules/home/profiles/hyprland.nix` and its program imports | Hyprland settings, bindings, and Caelestia |
+| Hyprland profile/program | `modules/home/profiles/hyprland.nix` and its program imports | Hyprland settings, bindings, Caelestia, and Noctalia |
 | NixOS gaming | `modules/nixos/gaming.nix` | Steam; future GameMode, Gamescope, or MangoHud additions |
 | Host-only hardware/layout | `hosts/<device>/` | NVIDIA settings, desktop DP-4 layout, Framework lid and monitor outputs |
 | OS-specific user settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |

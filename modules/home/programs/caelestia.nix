@@ -112,6 +112,16 @@ let
   });
   schemeFile = config.home.file."${config.xdg.stateHome}/caelestia/scheme.json";
   shellConfig = config.xdg.configFile."caelestia/shell.json";
+  ipc = "caelestia-shell ipc call";
+  # Packages and config stay installed either way, so switching back only
+  # needs desktop.hyprland.shell changed.
+  selected = config.desktop.hyprland.shell == "caelestia";
+  # Same shape as the bindings in hyprland.nix.
+  exec = mods: key: description: argument: {
+    kind = "bindd";
+    dispatcher = "exec";
+    inherit mods key description argument;
+  };
 in
 {
   home.packages = [
@@ -175,9 +185,35 @@ in
     ] (_: false);
   };
 
+  # IPC verified against the Caelestia module's installed 2.5.0 package.
+  desktop.hyprland.shellBindings = lib.mkIf selected [
+    (exec "SUPER ALT" "L" "Lock screen" "${ipc} lock lock")
+    (exec "SUPER" "P" "Toggle Caelestia dashboard" "${ipc} drawers toggle dashboard")
+  ];
+
+  programs.system-menu.sections.Hyprland = lib.mkIf selected (lib.mkAfter [
+    {
+      label = "Caelestia";
+      children = [
+        { label = "Dashboard"; action = "${ipc} drawers toggle dashboard"; }
+        { label = "Utilities"; action = "${ipc} drawers toggle utilities"; }
+        { label = "Sidebar"; action = "${ipc} drawers toggle sidebar"; }
+        { label = "App launcher"; action = "${ipc} drawers toggle launcher"; }
+      ];
+    }
+    {
+      label = "Power";
+      children = [
+        { label = "Lock screen"; action = "${ipc} lock lock"; }
+        # Caelestia's session drawer owns log out, suspend, restart and shut down.
+        { label = "Suspend / restart / shut down / log out"; action = "${ipc} drawers toggle session"; }
+      ];
+    }
+  ]);
+
   # Never attach this to graphical-session.target: Niri has its own shell.
   # Home Manager's Hyprland systemd integration starts/stops this target.
-  systemd.user.services.caelestia = {
+  systemd.user.services.caelestia = lib.mkIf selected {
     Unit = {
       Description = "Caelestia Shell";
       After = [ "hyprland-session.target" ];

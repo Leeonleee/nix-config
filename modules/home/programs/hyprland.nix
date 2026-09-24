@@ -1,8 +1,8 @@
 { config, lib, pkgs, ... }:
 
 let
+  cfg = config.desktop.hyprland;
   capture = lib.getExe config.programs.capture.package;
-  caelestiaIpc = "caelestia-shell ipc call";
   # A single source for Hyprland's described bindings and the searchable viewer.
   binding = kind: mods: key: description: dispatcher: argument: {
     inherit kind mods key description dispatcher argument;
@@ -43,9 +43,7 @@ let
     (exec "SUPER SHIFT" "slash" "Show keybindings" (lib.getExe viewer))
     (exec "SUPER" "Return" "Open terminal" "kitty")
     (exec "SUPER" "space" "Open Vicinae" "vicinae toggle")
-    # IPC verified against the Caelestia module's installed 2.5.0 package.
-    (exec "SUPER ALT" "L" "Lock screen" "caelestia-shell ipc call lock lock")
-    (exec "SUPER" "P" "Toggle Caelestia dashboard" "caelestia-shell ipc call drawers toggle dashboard")
+  ] ++ cfg.shellBindings ++ [
     (exec "SUPER SHIFT" "space" "Open system menu" (lib.getExe config.programs.system-menu.package))
     (exec "SUPER" "T" "Open Dolphin" "dolphin")
     (locked "SUPER ALT" "S" "Toggle screen reader" "exec" "${pkgs.procps}/bin/pkill orca || exec orca")
@@ -133,156 +131,159 @@ let
   );
 in
 {
-  home.packages = with pkgs; [ brightnessctl playerctl wl-clipboard fuzzel hyprpicker ];
-
-  # Hyprland equivalents of the Niri system menu's DMS and capture sections.
-  programs.system-menu.sections.Hyprland = [
-    {
-      label = "Capture";
-      children = [
-        {
-          label = "Screenshot";
-          children = [
-            { label = "Region"; action = "${lib.getExe screenshot} area"; }
-            { label = "Window"; action = "${lib.getExe screenshot} active"; }
-            { label = "Screen"; action = "${lib.getExe screenshot} output"; }
-          ];
-        }
-        { label = "Screen recording (toggle)"; action = "${capture} record toggle"; }
-        { label = "OCR region"; action = "${capture} ocr"; }
-        { label = "Colour picker"; action = "${lib.getExe pkgs.hyprpicker} --autocopy"; }
-      ];
-    }
-    {
-      label = "Caelestia";
-      children = [
-        { label = "Dashboard"; action = "${caelestiaIpc} drawers toggle dashboard"; }
-        { label = "Utilities"; action = "${caelestiaIpc} drawers toggle utilities"; }
-        { label = "Sidebar"; action = "${caelestiaIpc} drawers toggle sidebar"; }
-        { label = "App launcher"; action = "${caelestiaIpc} drawers toggle launcher"; }
-      ];
-    }
-    {
-      label = "Power";
-      children = [
-        { label = "Lock screen"; action = "${caelestiaIpc} lock lock"; }
-        # Caelestia's session drawer owns log out, suspend, restart and shut down.
-        { label = "Suspend / restart / shut down / log out"; action = "${caelestiaIpc} drawers toggle session"; }
-      ];
-    }
-  ];
-
-  systemd.user.services.hyprland-polkit-agent = {
-    Unit = {
-      Description = "PolicyKit authentication agent for Hyprland";
-      Requisite = [ "hyprland-session.target" ];
-      PartOf = [ "hyprland-session.target" ];
-      After = [ "hyprland-session.target" ];
+  options.desktop.hyprland = {
+    shell = lib.mkOption {
+      type = lib.types.enum [ "caelestia" "noctalia" ];
+      description = ''
+        Desktop shell started with Hyprland. Only the selected shell's service,
+        keybindings and system-menu entries are enabled; both remain installed.
+      '';
     };
-    Service = {
-      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-      Restart = "on-failure";
+    shellBindings = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      default = [ ];
+      internal = true;
+      description = "Bindings contributed by the selected shell module.";
     };
-    Install.WantedBy = [ "hyprland-session.target" ];
   };
 
-  wayland.windowManager.hyprland = {
-    enable = true;
-    package = pkgs.hyprland;
-    # Keep described Hyprlang bindings even on HM versions defaulting to Lua.
-    configType = "hyprlang";
-    xwayland.enable = true;
-    systemd = {
-      enable = true;
-      enableXdgAutostart = false;
+  config = {
+    home.packages = with pkgs; [ brightnessctl playerctl wl-clipboard fuzzel hyprpicker ];
+
+    # Hyprland equivalent of the Niri system menu's capture section. The
+    # selected shell module appends its own sections.
+    programs.system-menu.sections.Hyprland = [
+      {
+        label = "Capture";
+        children = [
+          {
+            label = "Screenshot";
+            children = [
+              { label = "Region"; action = "${lib.getExe screenshot} area"; }
+              { label = "Window"; action = "${lib.getExe screenshot} active"; }
+              { label = "Screen"; action = "${lib.getExe screenshot} output"; }
+            ];
+          }
+          { label = "Screen recording (toggle)"; action = "${capture} record toggle"; }
+          { label = "OCR region"; action = "${capture} ocr"; }
+          { label = "Colour picker"; action = "${lib.getExe pkgs.hyprpicker} --autocopy"; }
+        ];
+      }
+    ];
+
+    systemd.user.services.hyprland-polkit-agent = {
+      Unit = {
+        Description = "PolicyKit authentication agent for Hyprland";
+        Requisite = [ "hyprland-session.target" ];
+        PartOf = [ "hyprland-session.target" ];
+        After = [ "hyprland-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = [ "hyprland-session.target" ];
     };
-    # HM starts/stops hyprland-session.target. Caelestia must be attached to
-    # that target; DMS must be attached ONLY to niri.service in its own module,
-    # not graphical-session.target (which both compositors legitimately use).
-    settings = {
-      env = [ "NIXOS_OZONE_WL,1" ];
-      monitor = [ ",preferred,auto,1" ];
-      input = {
-        numlock_by_default = true;
-        follow_mouse = 1;
-        accel_profile = "flat";
-        sensitivity = 0;
-        touchpad = {
-          tap-to-click = true;
-          natural_scroll = true;
-          scroll_factor = 0.3;
+
+    wayland.windowManager.hyprland = {
+      enable = true;
+      package = pkgs.hyprland;
+      # Keep described Hyprlang bindings even on HM versions defaulting to Lua.
+      configType = "hyprlang";
+      xwayland.enable = true;
+      systemd = {
+        enable = true;
+        enableXdgAutostart = false;
+      };
+      # HM starts/stops hyprland-session.target. The selected Hyprland shell
+      # must be attached to that target; DMS must be attached ONLY to
+      # niri.service in its own module, not graphical-session.target (which
+      # both compositors legitimately use).
+      settings = {
+        env = [ "NIXOS_OZONE_WL,1" ];
+        monitor = [ ",preferred,auto,1" ];
+        input = {
+          numlock_by_default = true;
+          follow_mouse = 1;
+          accel_profile = "flat";
+          sensitivity = 0;
+          touchpad = {
+            tap-to-click = true;
+            natural_scroll = true;
+            scroll_factor = 0.3;
+          };
         };
-      };
-      general = {
-        layout = "scrolling";
-        # gaps_in applies to each window edge, so adjacent windows are 16px
-        # apart, matching Niri's gaps = 16.
-        gaps_in = 8;
-        gaps_out = 16;
-        border_size = 4;
-        "col.active_border" = lib.mkForce "rgba(${config.lib.stylix.colors.base0D}cc)";
-        "col.inactive_border" = lib.mkForce "rgb(${config.lib.stylix.colors.base03})";
-        # Niri does not wrap or jump to another window at a layout edge.
-        no_focus_fallback = true;
-      };
-      binds.window_direction_monitor_fallback = false;
-      scrolling = {
-        column_width = 0.5;
-        explicit_column_widths = "0.333, 0.5, 0.667";
-        # Niri's center-focused-column = "never": scroll just enough to fit.
-        focus_fit_method = 1; # fit
-        fullscreen_on_one_column = false;
-        # Approximates Niri's focus-follows-mouse max-scroll-amount = "50%".
-        follow_min_visible = 0.5;
-        wrap_focus = false;
-        wrap_swapcol = false;
-      };
-      decoration = {
-        rounding = 0;
-        shadow.enabled = false;
-      };
-      # Niri's named workspaces. Workspaces stack vertically, as in Niri.
-      workspace = [
-        "1, defaultName:browser, persistent:true"
-        "2, defaultName:terminal, persistent:true"
-        "3, defaultName:agents, persistent:true"
-        "4, defaultName:code, persistent:true"
-        "5, defaultName:social, persistent:true"
-      ];
-      windowrule = [
-        "float on, match:class firefox$, match:title ^Picture-in-Picture$"
-      ];
-      # Niri-like touchpad: swipe horizontally along columns, vertically
-      # between workspaces.
-      gesture = [
-        "3, horizontal, scrollMove"
-        "3, vertical, workspace"
-      ];
-      # Roughly Niri's default durations (150-250ms) and ease-out curve.
-      bezier = [ "easeOutExpo, 0.16, 1, 0.3, 1" ];
-      animation = [
-        "global, 1, 3, easeOutExpo"
-        "windows, 1, 2.5, easeOutExpo"
-        "windowsIn, 1, 1.5, easeOutExpo, popin 90%"
-        "windowsOut, 1, 1.5, easeOutExpo, popin 90%"
-        "border, 1, 2.5, easeOutExpo"
-        "fade, 1, 1.5, easeOutExpo"
-        "layers, 1, 2, easeOutExpo, fade"
-        "workspaces, 1, 2.5, easeOutExpo, slidevert"
-      ];
-      misc = {
-        disable_hyprland_logo = true;
-        disable_splash_rendering = true;
-        mouse_move_enables_dpms = true;
-        key_press_enables_dpms = true;
-      };
-      # Niri actions without a Hyprland equivalent are left unbound rather
-      # than substituted: overview (Super+O), first/last column, move column
-      # to first/last, window height presets, expand column to available
-      # width, center visible columns, workspace reordering and the shortcut
-      # inhibitor toggle. Directional monitor/workspace moves take ONE window,
-      # not a whole column, and Super+F sets full width rather than toggling.
-      # Super+P opens the dashboard rather than DMS's control center.
-    } // bindingSettings;
+        general = {
+          layout = "scrolling";
+          # gaps_in applies to each window edge, so adjacent windows are 16px
+          # apart, matching Niri's gaps = 16.
+          gaps_in = 8;
+          gaps_out = 16;
+          border_size = 4;
+          "col.active_border" = lib.mkForce "rgba(${config.lib.stylix.colors.base0D}cc)";
+          "col.inactive_border" = lib.mkForce "rgb(${config.lib.stylix.colors.base03})";
+          # Niri does not wrap or jump to another window at a layout edge.
+          no_focus_fallback = true;
+        };
+        binds.window_direction_monitor_fallback = false;
+        scrolling = {
+          column_width = 0.5;
+          explicit_column_widths = "0.333, 0.5, 0.667";
+          # Niri's center-focused-column = "never": scroll just enough to fit.
+          focus_fit_method = 1; # fit
+          fullscreen_on_one_column = false;
+          # Approximates Niri's focus-follows-mouse max-scroll-amount = "50%".
+          follow_min_visible = 0.5;
+          wrap_focus = false;
+          wrap_swapcol = false;
+        };
+        decoration = {
+          rounding = 0;
+          shadow.enabled = false;
+        };
+        # Niri's named workspaces. Workspaces stack vertically, as in Niri.
+        workspace = [
+          "1, defaultName:browser, persistent:true"
+          "2, defaultName:terminal, persistent:true"
+          "3, defaultName:agents, persistent:true"
+          "4, defaultName:code, persistent:true"
+          "5, defaultName:social, persistent:true"
+        ];
+        windowrule = [
+          "float on, match:class firefox$, match:title ^Picture-in-Picture$"
+        ];
+        # Niri-like touchpad: swipe horizontally along columns, vertically
+        # between workspaces.
+        gesture = [
+          "3, horizontal, scrollMove"
+          "3, vertical, workspace"
+        ];
+        # Roughly Niri's default durations (150-250ms) and ease-out curve.
+        bezier = [ "easeOutExpo, 0.16, 1, 0.3, 1" ];
+        animation = [
+          "global, 1, 3, easeOutExpo"
+          "windows, 1, 2.5, easeOutExpo"
+          "windowsIn, 1, 1.5, easeOutExpo, popin 90%"
+          "windowsOut, 1, 1.5, easeOutExpo, popin 90%"
+          "border, 1, 2.5, easeOutExpo"
+          "fade, 1, 1.5, easeOutExpo"
+          "layers, 1, 2, easeOutExpo, fade"
+          "workspaces, 1, 2.5, easeOutExpo, slidevert"
+        ];
+        misc = {
+          disable_hyprland_logo = true;
+          disable_splash_rendering = true;
+          mouse_move_enables_dpms = true;
+          key_press_enables_dpms = true;
+        };
+        # Niri actions without a Hyprland equivalent are left unbound rather
+        # than substituted: overview (Super+O), first/last column, move column
+        # to first/last, window height presets, expand column to available
+        # width, center visible columns, workspace reordering and the shortcut
+        # inhibitor toggle. Directional monitor/workspace moves take ONE window,
+        # not a whole column, and Super+F sets full width rather than toggling.
+        # Super+P is supplied by the selected shell module.
+      } // bindingSettings;
+    };
   };
 }
