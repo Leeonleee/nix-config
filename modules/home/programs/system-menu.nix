@@ -2,6 +2,7 @@
 
 let
   inherit (config.lib.formats.rasi) mkLiteral;
+  capture = args: lib.escapeShellArgs ([ (lib.getExe config.programs.capture.package) ] ++ args);
   dms = args: lib.escapeShellArgs ([ (lib.getExe config.programs.dank-material-shell.package) "ipc" "call" ] ++ args);
   terminal = command: lib.escapeShellArgs [
     (lib.getExe config.programs.kitty.package)
@@ -30,6 +31,23 @@ let
           { label = "Build configuration"; action = rebuild "build"; }
           { label = "Test configuration (temporary)"; action = rebuild "test"; }
           { label = "Switch configuration"; action = rebuild "switch"; }
+        ];
+      }
+      {
+        label = "Capture";
+        children = [
+          {
+            label = "Screenshot";
+            children = [
+              { label = "Region"; action = capture [ "screenshot" "region" ]; }
+              { label = "Window"; action = capture [ "screenshot" "window" ]; }
+              { label = "Screen"; action = capture [ "screenshot" "screen" ]; }
+            ];
+          }
+          { label = "Screen recording (toggle)"; action = capture [ "record" "toggle" ]; }
+          { label = "OCR region"; action = capture [ "ocr" ]; }
+          { label = "Colour picker"; action = capture [ "colour" ]; }
+          { label = "QR code"; action = capture [ "qr" ]; }
         ];
       }
       {
@@ -166,7 +184,7 @@ in
     };
   };
 
-  # Inherit the existing Catppuccin palette and fonts rather than duplicating them.
+  # Inherit the existing palette and fonts rather than duplicating them.
   stylix.targets.rofi.enable = true;
 
   programs.niri.settings.binds."Mod+Shift+Space" = {

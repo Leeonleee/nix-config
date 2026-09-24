@@ -3,6 +3,7 @@
  {
    imports = [
      ./dms-voxtype.nix
+     ./dms-recording.nix
      inputs.dms.homeModules.dank-material-shell
      inputs.dms.homeModules.niri
    ];
@@ -100,6 +101,10 @@
            rightWidgets = [
              {
                id = "voxtypeStatus";
+               enabled = true;
+             }
+             {
+               id = "recordingStatus";
                enabled = true;
              }
              {

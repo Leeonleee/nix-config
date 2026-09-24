@@ -104,6 +104,40 @@ be reset on rebuild; make persistent changes in `modules/home/programs/dms.nix`.
 To extend the menu, add an entry with `label` and either `action` or nested
 `children` to the `menu` tree in `system-menu.nix`.
 
+### Capture (Niri)
+
+`System → Capture` and these shortcuts use the shared `capture` command:
+
+| Shortcut | Action |
+| --- | --- |
+| `Print` | Native Niri screenshot selection |
+| `Ctrl+Print` | Native Niri screen screenshot |
+| `Alt+Print` | Native Niri window screenshot |
+| `Shift+Print` | Start/stop screen recording |
+| `Mod+Print` | Pick a colour → clipboard (`#RRGGBB`) |
+| `Mod+Ctrl+Print` | OCR region → clipboard |
+
+QR region extraction is available from the menu. OCR and QR use a separate
+region selector; cancellation or extraction failure leaves the clipboard alone.
+QR contents are copied, never automatically opened.
+
+Recording prompts for a target through the desktop portal and uses
+GPU Screen Recorder: H.264 MP4, 60 FPS, **no system audio or microphone**.
+Files go into `Recordings` under the XDG Videos directory (normally
+`~/Videos/Recordings`). Press `Shift+Print` again or click the DMS recording
+indicator to stop and finalize the file. The indicator hides when idle;
+its elapsed timer begins when the recorder first writes output, so it is
+approximate. Clicking a failed indicator dismisses the failed state.
+
+`modules/home/programs/capture.nix` owns the command and on-demand user service;
+`dms-recording.nix` owns the indicator. For troubleshooting:
+
+```sh
+capture record status
+journalctl --user -u capture-record.service
+python3 -B -m unittest discover -s modules/home/programs/capture -v
+```
+
 ### NixOS system roles
 
 | Role | Hosts | Examples |

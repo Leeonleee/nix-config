@@ -1,5 +1,8 @@
 { pkgs, lib, config, ... }:
 
+let
+  capture = lib.getExe config.programs.capture.package;
+in
 {
   # Niri-specific applications/utilities.
   home.packages = with pkgs; [
@@ -398,10 +401,32 @@
 
       "Mod+W".action.toggle-column-tabbed-display = [];
 
-      # Screenshots.
-      "Print".action.screenshot = [];
-      "Ctrl+Print".action.screenshot-screen = [];
-      "Alt+Print".action.screenshot-window = [];
+      # Capture: shared commands with the system menu.
+      "Print" = {
+        hotkey-overlay.title = "Screenshot region";
+        action.spawn = [ capture "screenshot" "region" ];
+      };
+      "Ctrl+Print" = {
+        hotkey-overlay.title = "Screenshot screen";
+        action.spawn = [ capture "screenshot" "screen" ];
+      };
+      "Alt+Print" = {
+        hotkey-overlay.title = "Screenshot window";
+        action.spawn = [ capture "screenshot" "window" ];
+      };
+      "Shift+Print" = {
+        repeat = false;
+        hotkey-overlay.title = "Toggle screen recording";
+        action.spawn = [ capture "record" "toggle" ];
+      };
+      "Mod+Print" = {
+        hotkey-overlay.title = "Pick a colour";
+        action.spawn = [ capture "colour" ];
+      };
+      "Mod+Ctrl+Print" = {
+        hotkey-overlay.title = "Copy text from region (OCR)";
+        action.spawn = [ capture "ocr" ];
+      };
 
       # Shortcut inhibitor escape hatch.
       "Mod+Escape" = {
