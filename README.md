@@ -83,11 +83,13 @@ applications, not part of the universal base. Keep platform modules focused on
 OS/user identity differences rather than using them to classify a host.
 Shared Niri compositor settings remain in one program module. The Niri profile
 also imports `modules/home/programs/system-menu.nix`: `Mod+Shift+Space` opens a
-Stylix-themed Rofi system menu; `Mod+Space` still opens Vicinae. Escape or
-“Back / close” returns to the parent menu (or closes the root). Rofi also accepts
-`Ctrl+j` / `Ctrl+k` for down/up, `Ctrl+l` for open/run, and `Ctrl+h` for back/close.
-Typing always filters entries; Enter, Escape, arrow keys, and Backspace still
-work normally. Fuzzel remains installed and can be launched manually.
+Stylix-themed Rofi system menu; `Mod+Space` still opens Vicinae. The menu uses
+Rofi script mode to update pages within one fixed-height window without
+relaunching it. `Ctrl+h` or the “Back” entry returns to the parent menu;
+`Ctrl+h` at the root or Escape anywhere closes it. Rofi also accepts
+`Ctrl+j` / `Ctrl+k` for down/up and `Ctrl+l` or Enter for open/run.
+Typing always filters entries; changing pages clears the search. Arrow keys
+and Backspace work normally. Fuzzel remains installed and can be launched manually.
 
 The system menu delegates settings, wallpaper, connectivity, and power actions
 to DMS IPC. NixOS checks/builds/test/switch run in Kitty with output retained;

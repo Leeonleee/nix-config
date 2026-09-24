@@ -68,40 +68,60 @@ let
     ];
   };
 
-  renderMenu = name: node: ''
-    ${name}() {
-      local choice
-      while true; do
-        if ! choice=$(printf '%s\n' ${lib.escapeShellArgs ((map (entry: entry.label) node.children) ++ [ "Back / close" ])} | rofi -dmenu -i -no-custom -format i -p ${lib.escapeShellArg node.label}); then
-          return 0
-        fi
-        case "$choice" in
-          ${lib.concatStringsSep "\n" (lib.imap0 (index: entry: ''
-            ${toString index})
-              ${if entry ? children then "${name}_${toString index}" else ''
-                if ${entry.action}; then
-                  exit 0
-                else
-                  notify-send --urgency=critical 'System menu' ${lib.escapeShellArg "Failed: ${entry.label}"}
-                fi
-              ''}
-              ;;
-          '') node.children)}
-          *) return 0 ;;
-        esac
-      done
-    }
-    ${lib.concatStringsSep "\n" (lib.imap0 (index: entry:
-      lib.optionalString (entry ? children) (renderMenu "${name}_${toString index}" entry)
-    ) node.children)}
+  # Stable IDs are passed as row metadata, independently of labels/filtering.
+  # ROFI_DATA records the current page; stripping its last index goes back.
+  renderMenu = id: node: ''
+    ${id})
+      ${if node ? children then ''
+        printf '\0data\x1f%s\n' ${lib.escapeShellArg id}
+        printf '\0no-custom\x1ftrue\n\0use-hot-keys\x1ftrue\n'
+        printf '\0keep-filter\x1ffalse\n'
+        ${lib.concatStringsSep "\n" (lib.imap0 (index: entry: ''
+          printf '%s\0info\x1f%s\n' ${lib.escapeShellArgs [ entry.label "${id}_${toString index}" ]}
+        '') node.children)}
+        printf '%s\0info\x1fback\x1fpermanent\x1ftrue\n' ${lib.escapeShellArg (if id == "root" then "Close" else "Back")}
+      '' else ''
+        # Do not hold Rofi's output pipe open while an action is running.
+        (
+          if ! ${node.action}; then
+            notify-send --urgency=critical 'System menu' ${lib.escapeShellArg "Failed: ${node.label}"}
+          fi
+        ) </dev/null >/dev/null 2>&1 &
+      ''}
+      ;;
+    ${lib.optionalString (node ? children) (lib.concatStringsSep "\n" (lib.imap0 (index: entry:
+      renderMenu "${id}_${toString index}" entry
+    ) node.children))}
   '';
+
+  menuBackend = pkgs.writeShellApplication {
+    name = "system-menu-backend";
+    runtimeInputs = [ pkgs.libnotify ];
+    text = ''
+      case "''${ROFI_RETV:-0}" in
+        0) target=root ;;
+        1) target="''${ROFI_INFO:-}" ;;
+        10) target=back ;;
+        *) exit 0 ;;
+      esac
+      if [[ "$target" == back ]]; then
+        current="''${ROFI_DATA:-root}"
+        [[ "$current" == root ]] && exit 0
+        target="''${current%_*}"
+      fi
+      case "$target" in
+        ${renderMenu "root" menu}
+        *) exit 0 ;;
+      esac
+    '';
+  };
 
   systemMenu = pkgs.writeShellApplication {
     name = "system-menu";
-    runtimeInputs = [ config.programs.rofi.finalPackage pkgs.libnotify ];
+    runtimeInputs = [ config.programs.rofi.finalPackage ];
     text = ''
-      ${renderMenu "menu_root" menu}
-      menu_root
+      exec rofi -show system -modes ${lib.escapeShellArg "system:${lib.getExe menuBackend}"} \
+        -i -kb-custom-1 'Control+h'
     '';
   };
 in
@@ -116,7 +136,7 @@ in
       kb-row-down = "Down,Control+n,Control+j";
       kb-row-up = "Up,Control+p,Control+k";
       kb-accept-entry = "Return,KP_Enter,Control+m,Control+l";
-      kb-cancel = "Escape,Control+g,Control+bracketleft,Control+h";
+      kb-cancel = "Escape,Control+g,Control+bracketleft";
       # Free Ctrl+h/k/l from Rofi's default editing/completion actions.
       kb-remove-char-back = "BackSpace,Shift+BackSpace";
       kb-remove-to-eol = "";
@@ -136,7 +156,7 @@ in
       entry.placeholder = "Search…";
       listview = {
         lines = 8;
-        fixed-height = false;
+        fixed-height = true;
         scrollbar = false;
       };
       element = {
