@@ -196,6 +196,10 @@ in
       enable = true;
       # Matches programs.hyprland.package in modules/nixos/hyprland.nix.
       package = pkgsUnstable.hyprland;
+      # NixOS registers the Hyprland portal; HM's copy would point the portal
+      # at a directory holding only hyprland.portal, hiding the gtk (colour
+      # scheme for libadwaita apps) and kde backends.
+      portalPackage = null;
       # Keep described Hyprlang bindings even on HM versions defaulting to Lua.
       configType = "hyprlang";
       xwayland.enable = true;
