@@ -20,7 +20,7 @@
      # machine-specific keys have been omitted.
      settings = {
        wallpaperFillMode = "Fill";
-       cornerRadius = 12;
+       cornerRadius = 0;
        barElevationEnabled = false;
        controlCenterShowMicPercent = true;
        showWorkspaceName = true;
