@@ -154,7 +154,7 @@ in
       notification.background_opacity = opacity.popups;
       osd.background_opacity = opacity.popups;
 
-      # DMS weather widget, located from the connection like DMS.
+      # Weather for the control center, located from the connection like DMS.
       weather.enabled = true;
       location.auto_locate = true;
 
@@ -177,21 +177,17 @@ in
         capsule_padding = 8.0;
 
         # Gaps separate the top widgets now that they have no capsules.
-        start = [ "launcher" "gap" "workspaces" "gap" "media" ];
-        center = [ "weather" "clock" "gap" "control-center" ];
+        start = [ "control-center" "gap" "workspaces" "gap" "media" ];
+        center = [ "clock" ];
+        # Voxtype, recording, microphone and media appear only while active.
         end = [
           "tray"
           "voxtype"
           "recording"
-          "clipboard"
           "gap"
-          "network"
-          "bluetooth"
           "volume"
           "microphone"
           "battery"
-          "gap"
-          "notifications"
         ];
       };
 
@@ -223,8 +219,6 @@ in
           vertical_format = "{:%H\n%M}";
           tooltip_format = "{:%A, %d %B %Y}";
         };
-        weather.show_condition = false;
-        network.show_label = false;
         # DMS keeps hidden tray items behind an expansion chevron; Noctalia's
         # drawer holds every item that is not pinned.
         tray.drawer = true;

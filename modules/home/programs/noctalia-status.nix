@@ -33,6 +33,8 @@ let
       barWidget.setGlyph(look.glyph)
       barWidget.setGlyphColor(look.color)
       barWidget.setTooltip("Voxtype: " .. state)
+      -- Only shown while listening or transcribing.
+      barWidget.setVisible(state == "recording" or state == "transcribing")
     end
 
     render()
