@@ -89,7 +89,8 @@ let
         barWidget.setGlyph("hourglass-high")
         barWidget.setGlyphColor("on_surface_variant")
       end
-      barWidget.setText(label)
+      -- Text does not fit the vertical bar; the glyph alone shows the state.
+      barWidget.setTooltip(label)
       -- Keep polling while hidden so a recording started by a keybinding appears.
       barWidget.setVisible(state ~= "idle")
     end
