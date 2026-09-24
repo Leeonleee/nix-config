@@ -26,13 +26,16 @@ let
 in
 {
   xdg.desktopEntries = lib.mapAttrs' (id: app:
-    lib.nameValuePair "webapp-${id}" {
+    let
+      appId = "webapp-${id}";
+    in lib.nameValuePair appId {
       name = app.name;
       type = "Application";
       terminal = false;
       categories = [ "Network" ];
       icon = "${app.icon}";
-      exec = "${quoteExecArg "${pkgs.google-chrome}/bin/google-chrome"} ${quoteExecArg "--app=${app.url}"}";
+      settings.StartupWMClass = appId;
+      exec = "${quoteExecArg "${pkgs.google-chrome}/bin/google-chrome"} ${quoteExecArg "--app=${app.url}"} ${quoteExecArg "--class=${appId}"}";
     }
   ) webApps;
 }

@@ -256,10 +256,13 @@ def worker():
         (directory / "state.json").unlink(missing_ok=True)
 
 
-def clipboard(text):
+def clipboard(text, sensitive=False):
     if not text.strip():
         raise ValueError("No text found; clipboard unchanged")
-    run("clipboard", "--type", "text/plain;charset=utf-8", input=text.encode())
+    args = ["--type", "text/plain;charset=utf-8"]
+    if sensitive:
+        args.append("--sensitive")
+    run("clipboard", *args, input=text.encode())
 
 
 def recognition(kind):
@@ -275,7 +278,7 @@ def recognition(kind):
         else:
             text = run("zbar", "--quiet", "--raw", "--set", "*.enable=0", "--set", "qrcode.enable=1",
                        image, capture_output=True, text=True).stdout.rstrip("\n")
-        clipboard(text)
+        clipboard(text, sensitive=(kind == "qr"))
         notify("Text copied" if kind == "ocr" else "QR content copied")
 
 

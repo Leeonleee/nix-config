@@ -320,8 +320,12 @@ so the flake can access them, then rebuild and activate. Home Manager generates
 `webapp-<id>.desktop` entries that Vicinae discovers after activation.
 
 Apps launch Chrome with `--app`, using the existing Chrome profile and logins.
+Each launcher sets `StartupWMClass=webapp-<id>` and passes the matching
+`--class=webapp-<id>` to Chrome to help running-icon matching and window grouping.
 This removes normal browser controls, but does not guarantee distinct Wayland
-window grouping or decorations.
+app IDs or decorations, especially when reusing an existing Chrome process.
+Before adding Niri window rules, check the actual `app-id` with
+`niri msg windows` (expected identities: `webapp-chatgpt`, `webapp-youtube`).
 
 ### Package scopes
 
@@ -385,16 +389,18 @@ Apply package changes with `rebuild-test`, then `rebuild` when everything works.
 
 ## Validate changes
 
-From the repository root, evaluate the flake and all three NixOS configurations,
-then explicitly evaluate macOS (not fully checked by `flake check`):
+From the repository root, evaluate the flake and NixOS configurations and run the
+capture unit tests, then explicitly evaluate macOS (not fully checked by `flake check`):
 
 ```sh
-nix --extra-experimental-features "nix-command flakes" flake check --no-build
+nix --extra-experimental-features "nix-command flakes" flake check
 nix --extra-experimental-features "nix-command flakes" eval --raw .#darwinConfigurations.mac.system.drvPath
 ```
 
-These commands do not build or activate the systems. Test Linux changes on the
-matching host with `nixos-rebuild test` before switching; build/check macOS with
+The flake check runs the capture tests for the current platform (Linux or macOS);
+use `--no-build` for evaluation only, without running tests. These commands do not
+build or activate the systems. Test Linux changes on the matching host with
+`nixos-rebuild test` before switching; build/check macOS with
 `darwin-rebuild` on the Mac. New module files must be added to Git for a Git flake
 to include them.
 

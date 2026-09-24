@@ -135,6 +135,20 @@
         };
     in
     {
+      checks = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-darwin" ] (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          capture-tests = pkgs.runCommand "capture-tests" {
+            nativeBuildInputs = [ pkgs.python3 ];
+          } ''
+            python3 -B -m unittest discover -s ${./modules/home/programs/capture} -v
+            touch "$out"
+          '';
+        }
+      );
+
       nixosConfigurations = {
         lsy-vm = nixpkgs.lib.nixosSystem {
           inherit system;
