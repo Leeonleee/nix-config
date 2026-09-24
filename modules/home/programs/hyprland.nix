@@ -201,6 +201,12 @@ in
       # both compositors legitimately use).
       settings = {
         env = [ "NIXOS_OZONE_WL,1" ];
+        # HM only restarts the session targets at login. Stop them on exit so
+        # Restart= services such as Vicinae and EasyEffects do not crash-loop
+        # without a display until the next login, each crash spawning DrKonqi.
+        exec-shutdown = [
+          "systemctl --user stop hyprland-session.target graphical-session.target"
+        ];
         monitor = [ ",preferred,auto,1" ];
         input = {
           numlock_by_default = true;
@@ -245,8 +251,8 @@ in
         workspace = [
           "1, defaultName:browser, persistent:true"
           "2, defaultName:terminal, persistent:true"
-          "4, defaultName:code, persistent:true"
-          "3, defaultName:agents, persistent:true"
+          "3, defaultName:code, persistent:true"
+          "4, defaultName:agents, persistent:true"
           "5, defaultName:social, persistent:true"
         ];
         windowrule = [
