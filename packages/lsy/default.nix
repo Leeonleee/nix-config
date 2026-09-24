@@ -1,4 +1,4 @@
-{ python3Packages }:
+{ lib, python3Packages }:
 
 python3Packages.buildPythonApplication {
   pname = "lsy";
@@ -15,5 +15,8 @@ python3Packages.buildPythonApplication {
   '';
 
   pythonImportsCheck = [ "lsy.cli" ];
-  meta.mainProgram = "lsy";
+  meta = {
+    mainProgram = "lsy";
+    platforms = lib.platforms.linux;
+  };
 }

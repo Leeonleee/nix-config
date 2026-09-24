@@ -51,6 +51,8 @@ and Framework monitor layouts are not shared defaults.
 - `modules/home/platforms/` - Linux and macOS identity/platform differences.
 - `modules/home/profiles/` - host-selected Home Manager roles: development, general-use, Linux workstation, and Niri.
 - `modules/home/programs/` - configuration for individual programs used by the base or profiles.
+- `packages/lsy/` - Linux-only lsylabs CLI, packaged and installed through Home Manager.
+- `hosts/lsy-vm/` - standalone disposable NixOS microVM; not a physical host or a `mkHost` configuration.
 
 The stable package source is the NixOS `26.05` branch. `nixpkgs-unstable`
 and `nixpkgs-master` are also available. Linux uses `x86_64-linux` package
@@ -129,6 +131,27 @@ sudo darwin-rebuild check --flake ~/nix-config#mac
 ```
 
 For a new computer, create a new directory under `hosts/`, use that computer's generated `hardware-configuration.nix`, and add the host to `nixosConfigurations` in `flake.nix` before rebuilding.
+
+## lsy utilities (Linux)
+
+```sh
+lsy try cowsay       # Temporary package shell; exit to leave
+lsy vm run           # Fresh NixOS guest; sudo poweroff inside to leave
+lsy vm run --flake ~/nix-config
+```
+
+`lsy vm run` uses `microvm.nix` with QEMU/KVM, user-mode networking, no host
+filesystem shares, and disposable RAM-backed guest state. It automatically logs
+in with your current account's username, a fresh home, and passwordless sudo;
+Git, curl, and Nano are included. No host credentials or files are copied.
+It builds the guest,
+not the host configuration. The first run downloads/builds the guest image;
+subsequent runs reuse it. Access to `/dev/kvm` is required; the Linux baseline
+adds `leonl` to the `kvm` group (log in again after rebuilding).
+
+The default checkout is `~/nix-config`. New files must be Git-tracked for flakes
+to include them. See [the CLI documentation](packages/lsy/README.md) for details.
+`lsy` is not installed on macOS.
 
 ## Add packages
 

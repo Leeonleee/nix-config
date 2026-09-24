@@ -47,6 +47,7 @@
       "networkmanager"
       "wheel"
       "docker"
+      "kvm" # Allow lsy vm run without sudo.
     ];
     shell = pkgs.zsh;
   };

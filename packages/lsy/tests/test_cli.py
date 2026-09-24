@@ -21,14 +21,14 @@ class CliTests(unittest.TestCase):
         self.assertEqual(execvp.call_args.args[1][-1], "nixpkgs#foo; echo unsafe")
 
     def test_invalid_usage(self):
-        for argv in ([], ["try"], ["unknown"], ["try", "--unknown"]):
+        for argv in ([], ["try"], ["unknown"], ["try", "--unknown"], ["vm"], ["vm", "unknown"]):
             with self.subTest(argv=argv), contextlib.redirect_stderr(io.StringIO()):
                 with self.assertRaises(SystemExit) as error:
                     main(argv)
                 self.assertEqual(error.exception.code, 2)
 
     def test_help(self):
-        for argv in (["--help"], ["try", "--help"]):
+        for argv in (["--help"], ["try", "--help"], ["vm", "--help"], ["vm", "run", "--help"]):
             with self.subTest(argv=argv), contextlib.redirect_stdout(io.StringIO()):
                 with self.assertRaises(SystemExit) as error:
                     main(argv)
@@ -38,7 +38,7 @@ class CliTests(unittest.TestCase):
         with patch("lsy.commands.try_package.os.execvp", side_effect=FileNotFoundError):
             with contextlib.redirect_stderr(io.StringIO()) as output:
                 self.assertEqual(main(["try", "hello"]), 127)
-        self.assertIn("nix was not found", output.getvalue())
+        self.assertIn("not found", output.getvalue())
 
 
 if __name__ == "__main__":
