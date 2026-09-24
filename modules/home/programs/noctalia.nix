@@ -213,8 +213,9 @@ in
           pill_scale = 1.0;
           active_pill_size = 1.1;
           inactive_pill_size = 1.1;
-          # Workspace initials; full names do not fit a vertical bar. The
-          # 11px label also grows with scale, so shrink it back to ~16px.
+          # The first character of each name is its Nerd Font icon (see the
+          # Niri and Hyprland workspace names). The 11px label also grows with
+          # scale, so shrink it back to ~16px.
           label_source = "name";
           max_label_chars = 1;
           font_scale = 0.8;

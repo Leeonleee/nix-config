@@ -120,14 +120,19 @@ let
     { key = "XF86AudioNext"; description = "Next track"; command = "next"; }
   ];
 
-  labels = pkgs.writeText "hyprland-keybindings.txt" (lib.concatMapStringsSep "\n" (b:
-    "${lib.optionalString (b.mods != "") "${b.mods} + "}${b.key}    ${b.description}"
-  ) bindings + "\n");
+  # Same Rofi presentation as niri-keybinds.
+  labels = pkgs.writeText "hyprland-keybindings.txt" (lib.concatMapStrings (b:
+    let key = "${lib.optionalString (b.mods != "") "${b.mods} + "}${b.key}";
+    in "<b>${lib.escapeXML key}</b>  <span alpha='70%'>·</span>  ${lib.escapeXML b.description}\n"
+  ) (lib.sort (a: b: lib.toLower a.description < lib.toLower b.description) bindings));
   viewer = pkgs.writeShellApplication {
     name = "hyprland-keybindings";
+    runtimeInputs = [ config.programs.rofi.finalPackage ];
     text = ''
       # Read-only: choosing a row never executes its associated command.
-      ${lib.getExe pkgs.fuzzel} --dmenu --prompt='Keybindings: ' < ${labels} > /dev/null || true
+      rofi -dmenu -i -markup-rows -no-custom -p Keybinds \
+        -theme-str 'window { width: 900px; } listview { lines: 14; }' \
+        < ${labels} > /dev/null || true
     '';
   };
   bindingSettings = lib.genAttrs (lib.unique (map (b: b.kind) bindings)) (kind:
@@ -261,11 +266,11 @@ in
         };
         # Niri's named workspaces. Workspaces stack vertically, as in Niri.
         workspace = [
-          "1, defaultName:browser, persistent:true"
-          "2, defaultName:terminal, persistent:true"
-          "3, defaultName:code, persistent:true"
-          "4, defaultName:agents, persistent:true"
-          "5, defaultName:social, persistent:true"
+          "1, defaultName:󰖟 browser, persistent:true"
+          "2, defaultName: terminal, persistent:true"
+          "3, defaultName:󰅩 code, persistent:true"
+          "4, defaultName:󰚩 agents, persistent:true"
+          "5, defaultName:󰭹 social, persistent:true"
         ];
         windowrule = [
           "float on, match:class firefox$, match:title ^Picture-in-Picture$"

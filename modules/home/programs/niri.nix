@@ -46,13 +46,15 @@ in
     # -------------------------------------------------------------------------
 
     # niri-flake creates workspaces sorted by key, so numbered keys keep the
-    # order; it matches the Hyprland workspace order in hyprland.nix.
+    # order; it matches the Hyprland workspace order in hyprland.nix. Names
+    # start with a Nerd Font glyph (web, terminal, code braces, robot, chat)
+    # that Noctalia's one-character workspace labels show as an icon.
     workspaces = {
-      "1-browser".name = "browser";
-      "2-terminal".name = "terminal";
-      "3-code".name = "code";
-      "4-agents".name = "agents";
-      "5-social".name = "social";
+      "1-browser".name = "󰖟 browser";
+      "2-terminal".name = " terminal";
+      "3-code".name = "󰅩 code";
+      "4-agents".name = "󰚩 agents";
+      "5-social".name = "󰭹 social";
     };
 
     # -------------------------------------------------------------------------
