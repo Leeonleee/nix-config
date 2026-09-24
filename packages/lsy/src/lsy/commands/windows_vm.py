@@ -452,12 +452,12 @@ def freerdp_arguments(username: str, password: str, scale: int | None = None) ->
         f"/p:{password}",
         # Dockur's self-signed certificate changes with each install; RDP is loopback-only.
         "/cert:ignore",
-        "/f",
         "+dynamic-resolution",
         "+clipboard",
         "/sound",
         "/microphone",
         "+auto-reconnect",
+        # Opens as a normal (tiled) window; Ctrl+Alt+Enter toggles fullscreen.
         "/floatbar:sticky:off,default:visible,show:fullscreen",
         "/title:Windows 11",
         "/wm-class:lsy-windows",
@@ -787,7 +787,7 @@ def register(subparsers) -> None:
 
     launch_parser = commands.add_parser(
         "launch",
-        help="Start the VM and connect fullscreen with FreeRDP",
+        help="Start the VM and connect with FreeRDP",
         description="Start the VM if needed, wait until Windows accepts RDP, then open FreeRDP. "
                     "Closing FreeRDP shuts the VM down unless --keep-alive is given.",
     )

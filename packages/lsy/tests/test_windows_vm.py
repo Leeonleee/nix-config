@@ -328,8 +328,9 @@ class LaunchTests(WindowsVmTestCase):
         arguments = self.run.call_args.kwargs["input"].splitlines()
         self.assertIn("/p:s3cret", arguments)
         self.assertIn("/u:alice", arguments)
-        for option in ("/f", "+dynamic-resolution", "+clipboard", "/sound", "/microphone"):
+        for option in ("+dynamic-resolution", "+clipboard", "/sound", "/microphone"):
             self.assertIn(option, arguments)
+        self.assertNotIn("/f", arguments)
         self.assertTrue(all("s3cret" not in part for part in command))
 
     def test_keep_alive_leaves_vm_running(self):

@@ -115,8 +115,9 @@ comes only from `~/.windows`.
 
 `launch` starts the VM if necessary and waits for Windows to complete a real RDP
 handshake twice. Docker's port proxy accepts TCP connections before Windows
-listens, so a plain port check is not enough. It then opens fullscreen FreeRDP
-with dynamic resolution, clipboard, sound and microphone. Closing FreeRDP shuts
+listens, so a plain port check is not enough. It then opens FreeRDP as a normal
+window, which the compositor tiles, with dynamic resolution, clipboard, sound
+and microphone. Ctrl+Alt+Enter toggles fullscreen. Closing FreeRDP shuts
 the VM down unless `--keep-alive` is given. If Windows itself drops the
 connection (FreeRDP exit code 1, for example while applying display settings),
 `launch` reconnects instead. It gives up after more than three drops, counting

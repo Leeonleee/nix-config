@@ -346,7 +346,7 @@ to include them. See [the CLI documentation](packages/lsy/README.md) for details
 ```sh
 lsy windows vm install            # Once, in a terminal: checks, credentials, starts setup
 lsy windows vm console            # Watch the unattended installation at localhost:8006
-lsy windows vm launch             # Fullscreen FreeRDP; closing it shuts Windows down
+lsy windows vm launch             # FreeRDP window; closing it shuts Windows down
 lsy windows vm launch --keep-alive
 lsy windows vm status
 lsy windows vm stop
