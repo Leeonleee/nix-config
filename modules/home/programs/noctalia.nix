@@ -132,11 +132,13 @@ in
 
       bar.main = {
         position = "left";
-        # DMS: full-length, square, opaque and without elevation.
+        # Floats clear of the screen edge; square, opaque and without elevation.
         background_opacity = opacity.desktop;
         radius = 0;
-        margin_ends = 0;
-        margin_edge = 0;
+        # Gap between the bar and the left screen edge.
+        margin_edge = 8;
+        # Gap at the top and bottom ends of the vertical bar.
+        margin_ends = 8;
         shadow = false;
         thickness = 38;
         padding = 8;

@@ -245,8 +245,8 @@ in
         workspace = [
           "1, defaultName:browser, persistent:true"
           "2, defaultName:terminal, persistent:true"
-          "3, defaultName:agents, persistent:true"
           "4, defaultName:code, persistent:true"
+          "3, defaultName:agents, persistent:true"
           "5, defaultName:social, persistent:true"
         ];
         windowrule = [
