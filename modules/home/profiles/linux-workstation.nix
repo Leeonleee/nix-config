@@ -5,6 +5,7 @@
   imports = [
     ../programs/voxtype.nix
     ../programs/vicinae.nix
+    ../programs/web-apps.nix
   ];
 
   services.trayscale.enable = true;

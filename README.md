@@ -273,6 +273,31 @@ Recording, Transcribing, or Stopped. Its source is in
 component in the store, and Home Manager installs and enables it.
 After widget-only changes, restart DMS with `systemctl --user restart dms`.
 
+### Declarative web apps
+
+On `desktop` and `framework`, the Linux workstation profile imports
+`modules/home/programs/web-apps.nix`. Its module-local `webApps` attrset defines
+ChatGPT and YouTube by default. To add an app, add an ID with `name`, `url`, and
+`icon` fields to that attrset, for example:
+
+```nix
+example = {
+  name = "Example";
+  url = "https://example.com";
+  icon = ./web-apps/icons/example.svg;
+};
+```
+
+Use local SVG or PNG icons under `modules/home/programs/web-apps/icons/`;
+the defaults are `modules/home/programs/web-apps/icons/chatgpt.svg` and
+`modules/home/programs/web-apps/icons/youtube.svg`. Include new icons in Git
+so the flake can access them, then rebuild and activate. Home Manager generates
+`webapp-<id>.desktop` entries that Vicinae discovers after activation.
+
+Apps launch Chrome with `--app`, using the existing Chrome profile and logins.
+This removes normal browser controls, but does not guarantee distinct Wayland
+window grouping or decorations.
+
 ### Package scopes
 
 Add a package according to where it should be available:
