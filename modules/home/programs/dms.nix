@@ -14,6 +14,14 @@
      enable = true;
      systemd.enable = true;
      session.wallpaperPath = "${../../../assets/wallpapers/lavender-cat.png}";
+     # DMS uses Id::ToolTip title when the title differs from the ID.
+     # Hidden items remain accessible through the tray's expansion chevron.
+     session.hiddenTrayIds = [
+       "Claude_status_icon_1::Claude"
+       "vesktop_status_icon_1::Vesktop"
+       "Easy Effects"
+       "dev.deedles.Trayscale"
+     ];
       
      # Migrated from the old DMS configVersion 13 settings file to the current
      # configVersion 16 format. Values matching DMS defaults and obsolete or
@@ -27,6 +35,7 @@
        appIdSubstitutions = [ ];
        appDrawerSectionViewModes.apps = "grid";
        networkPreference = "wifi";
+       systemTrayIconTintMode = "monochrome";
 
        cursorSettings = {
          theme = "System Default";
@@ -90,13 +99,17 @@
 
            rightWidgets = [
              "voxtypeStatus"
-             "systemTray"
+             {
+               id = "systemTray";
+               enabled = true;
+               trayUseInlineExpansion = true;
+             }
              "clipboard"
              "cpuUsage"
              "memUsage"
-             "notificationButton"
-             "battery"
              "controlCenterButton"
+             "battery"
+             "notificationButton"
            ];
 
            spacing = 4;
