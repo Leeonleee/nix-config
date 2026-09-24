@@ -4,6 +4,10 @@ let
   capture = lib.getExe config.programs.capture.package;
 in
 {
+  # The shell (DMS or Noctalia) is selected with desktop.niri.shell; its
+  # service, shell keybindings and system-menu entries live in its module.
+  imports = [ ./niri-shell.nix ];
+
   # Niri-specific applications/utilities.
   home.packages = with pkgs; [
     brightnessctl
@@ -188,10 +192,6 @@ in
     # -------------------------------------------------------------------------
 
     binds = {
-      "Mod+Shift+Slash" = {
-        action.spawn = ["dms" "ipc" "call" "keybinds" "toggle" "niri"];
-      };
-
       "Mod+Return" = {
         hotkey-overlay.title = "Open a Terminal: kitty";
         action.spawn = "kitty";
@@ -200,17 +200,6 @@ in
       "Mod+Space" = {
         hotkey-overlay.title = "Open Vicinae";
         action.spawn = [ "vicinae" "toggle" ];
-      };
-
-      "Super+Alt+L" = {
-        hotkey-overlay.title = "Lock the Screen: DMS";
-        action.spawn = [
-          "dms"
-          "ipc"
-          "call"
-          "lock"
-          "lock"
-        ];
       };
 
       "Mod+T" = {
@@ -439,18 +428,6 @@ in
       "Ctrl+Alt+Delete".action.quit = [];
 
       "Mod+Shift+P".action.power-off-monitors = [];
-
-      # DMS Binds
-      "Mod+P" = {
-        action.spawn = [
-          "dms"
-          "ipc"
-          "call"
-          "control-center"
-          "toggle"
-        ];
-      };
-      
     };
   };
 }

@@ -87,9 +87,11 @@ Role boundaries:
   such as Chrome, Bitwarden, VS Code, Kitty, and Vesktop.
 - `modules/home/profiles/linux-workstation.nix` owns Linux-only utilities
   such as Kate, Voxtype, Vicinae, and Trayscale.
-- `modules/home/profiles/niri.nix` composes the shared Niri and DMS program
-  modules. `modules/home/programs/niri.nix` owns shared layout, input, rules,
-  keybindings, and Niri utilities.
+- `modules/home/profiles/niri.nix` composes the shared Niri, DMS and Noctalia
+  program modules and selects the Niri shell with `desktop.niri.shell`
+  (`"dms"` or `"noctalia"`). `modules/home/programs/niri.nix` owns shared
+  layout, input, rules, keybindings, and Niri utilities; shell keybindings
+  live in the selected shell's module.
 - `hosts/<name>/home.nix` owns one-device packages and settings. Desktop and
   Framework monitor layouts stay host-specific.
 
@@ -195,6 +197,13 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Add or change desktop gaming system packages in `modules/nixos/gaming.nix`.
 - Change the global NixOS Stylix scheme or font in `modules/theme.nix`.
 - Change DMS settings in `modules/home/programs/dms.nix`.
+- Change Noctalia settings in `modules/home/programs/noctalia.nix`; its session
+  wiring lives in `noctalia-hyprland.nix` and `noctalia-niri.nix`, and
+  `noctalia-service.nix` binds its single user service to every session that
+  selects it.
+- Switch the Niri shell with `desktop.niri.shell` in
+  `modules/home/profiles/niri.nix`, or the Hyprland shell with
+  `desktop.hyprland.shell` in `modules/home/profiles/hyprland.nix`.
 - Change shared shell aliases in `modules/home/programs/zsh.nix`.
 - Add a host by creating `hosts/<name>/`, supplying its hardware configuration, system state version, and `home.nix` with its Home Manager state version, and adding a flake output in `flake.nix`.
 - Add device-specific Home Manager packages and settings in `hosts/<name>/home.nix`; leave the file focused on that host's needs.

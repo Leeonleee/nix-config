@@ -37,9 +37,11 @@ Niri has two layers:
 - `modules/nixos/niri.nix` contains shared system integration: the upstream
   Niri and `nirinit` modules, the Niri overlay, portal and application-menu
   setup, and the Dankshell PAM setting.
-- `modules/home/profiles/niri.nix` selects the shared Home Manager Niri/DMS
-  configuration. `modules/home/programs/niri.nix` contains the shared Niri
-  layout, input, rules, utilities, and keybindings.
+- `modules/home/profiles/niri.nix` selects the shared Home Manager Niri
+  configuration and its shell, DMS or Noctalia (see
+  [Choosing the Niri shell](#choosing-the-niri-shell)).
+  `modules/home/programs/niri.nix` contains the shared Niri layout, input,
+  rules, utilities, and keybindings.
 
 NVIDIA configuration remains in the desktop host. Framework laptop behavior,
 lid handling, and monitor outputs remain in Framework host files. The desktop
@@ -82,8 +84,9 @@ while Framework retains eDP-1 at scale 1.5 and its dock connector positions.
 Framework's Hyprland lid handling, which turns eDP-1 off and on like Niri's,
 lives in `hosts/framework/hyprland.nix`.
 
-DMS is bound to `niri.service`, while the selected Hyprland shell belongs to
-`hyprland-session.target`; rebuilding outside Niri will not start DMS. Fully
+The selected Niri shell is bound to `niri.service`, while the selected Hyprland
+shell belongs to `hyprland-session.target`; rebuilding outside Niri will not
+start DMS. Fully
 log out between sessions so their services and portal environment are replaced.
 Hyprland uses its own screencast portal and the KDE file chooser, without
 changing Niri's portal selection.
@@ -108,16 +111,32 @@ configured; the option only selects which user service is wanted by
 `hyprland-session.target`, and which shell supplies the lock, **Super+P** and
 system-menu entries. A running Hyprland session switches shells on
 `nixos-rebuild switch`, because Home Manager stops the old unit and starts the
-new one. Niri always uses DMS.
+new one.
+
+#### Choosing the Niri shell
+
+One option in `modules/home/profiles/niri.nix` selects the Niri shell:
+
+```nix
+desktop.niri.shell = "dms"; # or "noctalia"
+```
+
+Both shells stay installed. The option selects which shell's user service is
+wanted by `niri.service`, and which shell supplies **Super+P**, the lock,
+**Super+Shift+/** and the Niri system-menu entries. DMS-specific settings live in
+`modules/home/programs/dms.nix`; Noctalia's Niri bindings live in
+`modules/home/programs/noctalia-niri.nix` and share `noctalia.nix` with
+Hyprland. Noctalia has no keybind viewer, so **Super+Shift+/** opens Niri's
+own hotkey overlay when it is selected. When both compositors select
+Noctalia, its single service is wanted by both sessions.
 
 Noctalia v5 comes from the unstable package set and the Home Manager unstable
 module (through `modules/home/home-manager-unstable.nix`), with no additional
 flake input. `modules/home/programs/noctalia.nix` holds its compositor-independent
-settings, laid out like DMS: a full-width square top bar with the launcher,
-workspace names and media on the left; weather, clock and window title in the
-centre; and the tray drawer, Voxtype and recording indicators, clipboard,
-network, Bluetooth, volume, microphone, control center, battery and
-notifications on the right. `programs/noctalia-status.nix` ports the DMS Voxtype
+settings: a floating left bar with square widget boxes, holding the control
+center, workspace initials and media at the top; the clock in the middle; and
+the tray drawer, Voxtype and recording indicators, volume, microphone and
+battery at the bottom. The DMS bar in `dms.nix` mirrors this layout. `programs/noctalia-status.nix` ports the DMS Voxtype
 and recording widgets as a Nix-built Noctalia plugin. Stylix has no Noctalia v5
 target, so the module maps the Stylix palette to a custom Noctalia palette, as
 Stylix's v4 target does, and disables Noctalia's application templates. The

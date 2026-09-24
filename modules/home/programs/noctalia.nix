@@ -55,10 +55,11 @@ let
   wallpapers = ../../../assets/wallpapers;
 in
 {
-  # Compositor-independent shell configuration. Session wiring, such as the
-  # Hyprland service and keybindings, lives in noctalia-hyprland.nix.
+  # Compositor-independent shell configuration. Session wiring, such as
+  # keybindings, lives in noctalia-hyprland.nix and noctalia-niri.nix.
   imports = [
     ../home-manager-unstable.nix
+    ./noctalia-service.nix
     ./noctalia-status.nix
   ];
 
@@ -177,7 +178,7 @@ in
         capsule_radius = 0.0;
         capsule_padding = 8.0;
 
-        # Gaps separate the top widgets now that they have no capsules.
+        # Spacers separate the top widgets.
         start = [ "control-center" "gap" "workspaces" "gap" "media" ];
         center = [ "clock" ];
         # Voxtype, recording, microphone and media appear only while active.

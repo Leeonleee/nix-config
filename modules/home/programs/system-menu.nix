@@ -4,7 +4,6 @@ let
   inherit (config.lib.formats.rasi) mkLiteral;
   cfg = config.programs.system-menu;
   capture = args: lib.escapeShellArgs ([ (lib.getExe config.programs.capture.package) ] ++ args);
-  dms = args: lib.escapeShellArgs ([ (lib.getExe config.programs.dank-material-shell.package) "ipc" "call" ] ++ args);
   terminal = command: lib.escapeShellArgs [
     (lib.getExe config.programs.kitty.package)
     "--hold"
@@ -162,6 +161,7 @@ in
     # Inherit the existing palette and fonts rather than duplicating them.
     stylix.targets.rofi.enable = true;
 
+    # The selected Niri shell appends its own sections.
     programs.system-menu.sections.niri = [
       {
         label = "Capture";
@@ -190,39 +190,6 @@ in
               }
             ];
           }
-        ];
-      }
-      {
-        label = "DMS settings";
-        children = [
-          { label = "All settings"; action = dms [ "settings" "open" ]; }
-          { label = "Control center"; action = dms [ "control-center" "open" ]; }
-          { label = "Bar appearance"; action = dms [ "settings" "openWith" "dankbar_appearance" ]; }
-        ];
-      }
-      {
-        label = "Appearance / wallpaper";
-        children = [
-          { label = "Browse wallpapers"; action = dms [ "dash" "open" "wallpaper" ]; }
-          { label = "Wallpaper settings"; action = dms [ "settings" "openWith" "personalization" ]; }
-          { label = "Theme and colors"; action = dms [ "settings" "openWith" "theme" ]; }
-          { label = "Interface appearance"; action = dms [ "settings" "openWith" "theme_surfaces" ]; }
-        ];
-      }
-      {
-        label = "Network / Bluetooth";
-        children = [
-          { label = "Network"; action = dms [ "control-center" "openWith" "network" ]; }
-          { label = "Bluetooth"; action = dms [ "control-center" "openWith" "bluetooth" ]; }
-          { label = "Network settings"; action = dms [ "settings" "openWith" "network" ]; }
-        ];
-      }
-      {
-        label = "Power";
-        children = [
-          { label = "Lock screen"; action = dms [ "lock" "lock" ]; }
-          # DMS owns power actions, confirmation, and lock-before-suspend.
-          { label = "Suspend / restart / shut down / log out"; action = dms [ "powermenu" "open" ]; }
         ];
       }
     ];
