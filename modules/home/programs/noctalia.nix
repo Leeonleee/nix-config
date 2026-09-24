@@ -1,4 +1,4 @@
-{ config, pkgsUnstable, ... }:
+{ config, pkgs, pkgsUnstable, ... }:
 
 let
   colours = config.lib.stylix.colors.withHashtag;
@@ -105,6 +105,34 @@ in
         };
         # DMS app drawer grid view.
         launcher.app_grid = true;
+        # Power menu. Noctalia replaces this list as a whole, so every entry is
+        # listed; the last one mirrors DMS's restart-shell button.
+        session.actions =
+          let
+            action = name: shortcut: {
+              action = name;
+              inherit shortcut;
+              countdown_seconds = 0.0;
+              enabled = true;
+              variant = "default";
+            };
+          in
+          [
+            (action "lock" "1")
+            (action "logout" "2")
+            (action "lock_and_suspend" "3")
+            (action "reboot" "4")
+            (action "shutdown" "5" // { variant = "destructive"; })
+            {
+              action = "command";
+              command = "${pkgs.systemd}/bin/systemctl --user restart noctalia";
+              label = "Restart Noctalia";
+              shortcut = "6";
+              countdown_seconds = 0.0;
+              enabled = true;
+              variant = "default";
+            }
+          ];
       };
 
       wallpaper = {
