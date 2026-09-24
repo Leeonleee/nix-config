@@ -126,8 +126,9 @@ wanted by `niri.service`, and which shell supplies **Super+P**, the lock,
 **Super+Shift+/** and the Niri system-menu entries. DMS-specific settings live in
 `modules/home/programs/dms.nix`; Noctalia's Niri bindings live in
 `modules/home/programs/noctalia-niri.nix` and share `noctalia.nix` with
-Hyprland. Noctalia has no keybind viewer, so **Super+Shift+/** opens Niri's
-own hotkey overlay when it is selected. When both compositors select
+Hyprland. Noctalia has no keybind viewer, so **Super+Shift+/** opens a
+searchable Rofi list of every Niri binding (`modules/home/programs/niri-keybinds.nix`)
+when it is selected. When both compositors select
 Noctalia, its single service is wanted by both sessions.
 
 Noctalia v5 comes from the unstable package set and the Home Manager unstable

@@ -45,12 +45,14 @@ in
     # Workspaces
     # -------------------------------------------------------------------------
 
+    # niri-flake creates workspaces sorted by key, so numbered keys keep the
+    # order; it matches the Hyprland workspace order in hyprland.nix.
     workspaces = {
-      browser = {};
-      terminal = {};
-      agents = {};
-      code = {};
-      social = {};
+      "1-browser".name = "browser";
+      "2-terminal".name = "terminal";
+      "3-code".name = "code";
+      "4-agents".name = "agents";
+      "5-social".name = "social";
     };
 
     # -------------------------------------------------------------------------

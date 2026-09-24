@@ -16,8 +16,11 @@ in
     # brightness and media keys stay in niri.nix.
     programs.niri.settings = {
       binds = {
-        # Noctalia has no keybind viewer; use Niri's own overlay.
-        "Mod+Shift+Slash".action.show-hotkey-overlay = [ ];
+        # Noctalia has no keybind viewer; use the searchable Rofi list.
+        "Mod+Shift+Slash" = {
+          hotkey-overlay.title = "Show all keybindings";
+          action.spawn = lib.getExe config.programs.niri-keybinds.package;
+        };
         "Super+Alt+L" = spawn "Lock the Screen: Noctalia" "session lock";
         "Mod+P" = spawn "Toggle control center" "panel-toggle control-center";
         "Mod+N" = spawn "Toggle notification history" "panel-toggle control-center notifications";

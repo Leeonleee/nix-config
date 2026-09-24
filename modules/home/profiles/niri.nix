@@ -1,6 +1,7 @@
 {
   imports = [
     ../programs/niri.nix
+    ../programs/niri-keybinds.nix
     ../programs/capture.nix
     ../programs/dms.nix
     ../programs/noctalia.nix
@@ -10,5 +11,5 @@
 
   # Shell started with Niri: "dms" or "noctalia". Both stay installed; only
   # the selected one runs and owns the shell keybindings.
-  desktop.niri.shell = "dms";
+  desktop.niri.shell = "noctalia";
 }
