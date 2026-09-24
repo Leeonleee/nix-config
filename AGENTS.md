@@ -86,7 +86,10 @@ Role boundaries:
 - `modules/home/profiles/general-use.nix` owns graphical daily applications
   such as Chrome, Bitwarden, VS Code, Kitty, and Vesktop.
 - `modules/home/profiles/linux-workstation.nix` owns Linux-only utilities
-  such as Kate, Voxtype, Vicinae, and Trayscale.
+  such as Kate, Voxtype, Vicinae, and Trayscale. It imports
+  `modules/home/programs/windows-vm.nix`, which installs FreeRDP, the
+  `Windows 11` desktop entry, and the system menu's `Windows` section for
+  `lsy windows vm`.
 - `modules/home/profiles/niri.nix` composes the shared Niri, DMS and Noctalia
   program modules and selects the Niri shell with `desktop.niri.shell`
   (`"dms"` or `"noctalia"`). `modules/home/programs/niri.nix` owns shared
@@ -205,6 +208,14 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
   `modules/home/profiles/niri.nix`, or the Hyprland shell with
   `desktop.hyprland.shell` in `modules/home/profiles/hyprland.nix`.
 - Change shared shell aliases in `modules/home/programs/zsh.nix`.
+- Change the `lsy` CLI in `packages/lsy/`: commands live in
+  `src/lsy/commands/` and are registered in `cli.py`; tests in `tests/` run in
+  the package's `checkPhase`. Other Home Manager modules reference the package
+  as `config.programs.lsy.package`.
+- Change the persistent Windows VM in `packages/lsy/src/lsy/commands/windows_vm.py`
+  (Dockur Compose definition, lifecycle, removal) and its desktop entry and
+  menu in `modules/home/programs/windows-vm.nix`. Menu sections shared by every
+  session go in `programs.system-menu.commonSections`.
 - Add a host by creating `hosts/<name>/`, supplying its hardware configuration, system state version, and `home.nix` with its Home Manager state version, and adding a flake output in `flake.nix`.
 - Add device-specific Home Manager packages and settings in `hosts/<name>/home.nix`; leave the file focused on that host's needs.
 
@@ -219,4 +230,9 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Shared Niri system integration belongs in `modules/nixos/niri.nix`; Framework-specific Niri output names and lid events live in `hosts/framework/niri.nix`, and the desktop monitor layout remains host-specific.
 - Niri's portal setup deliberately uses the KDE file chooser alongside Dolphin because the default GNOME portal delegates to Nautilus, which is not installed.
 - A successful flake check currently emits a known Stylix warning that the KDE `qt` platform is not supported beyond `qtct`.
+- `lsy windows vm` keeps Windows state only in `~/.windows`; the Compose
+  container is disposable, has no restart policy, and publishes ports only on
+  `127.0.0.1`. Credentials live in `~/.config/lsy/windows/credentials.env`
+  (0600) and must never enter Git or the Nix store. `remove` must keep
+  `~/Windows` and must refuse symlinked or otherwise unsafe storage paths.
 - The README is the human-facing setup guide and should stay consistent with host names, role selection, package sources, and rebuild commands.

@@ -7,9 +7,13 @@
     ../programs/voxtype.nix
     ../programs/vicinae.nix
     ../programs/web-apps.nix
+    ../programs/windows-vm.nix
   ];
 
   services.trayscale.enable = true;
+
+  # Windows VM display scale in percent; null follows the focused monitor.
+  programs.windows-vm.scale = 175;
 
   # Use `tailscale status` to find names; nicknamed devices appear first.
   services.dolphin-taildrop.nicknames = {

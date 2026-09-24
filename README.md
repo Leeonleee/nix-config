@@ -194,7 +194,7 @@ specific host roles:
 | Minimal universal base | Every host, through `modules/home/default.nix` | Git, Zsh, Neovim/Nixvim, Starship, Eza, fastfetch, the Stylix theme, and small baseline CLI tools |
 | Development | `dev-nix`, `desktop`, `framework`, and `mac` | Toolchains, compilers, build tools, `direnv`, development CLIs, and coding-agent programs |
 | General-use | `desktop`, `framework`, and `mac` | Graphical daily applications such as Chrome, Bitwarden, VS Code, Kitty, and Vesktop |
-| Linux workstation | `desktop` and `framework` | Linux-only utilities such as Kate, Voxtype, Vicinae, and Trayscale |
+| Linux workstation | `desktop` and `framework` | Linux-only utilities such as Kate, Voxtype, Vicinae, Trayscale, and the Windows 11 VM integration |
 | Niri | `desktop` and `framework` | Niri/DMS configuration and session utilities such as Fuzzel, brightnessctl, playerctl, and wl-clipboard |
 | Hyprland | `desktop` and `framework` | Trial Hyprland desktop with the Caelestia or Noctalia shell |
 | Host-specific | A single host | Hardware-dependent settings, layouts, services, and one-device packages |
@@ -218,7 +218,8 @@ rebuilds use `~/nix-config` and the current hostname, like the shell aliases.
 Test/switch may request sudo authentication. DMS settings managed by Nix can
 be reset on rebuild; make persistent changes in `modules/home/programs/dms.nix`.
 To extend the menu, add an entry with `label` and either `action` or nested
-`children` to the `menu` tree in `system-menu.nix`.
+`children` to the `menu` tree in `system-menu.nix`. Sections shown in every
+session, such as `Windows`, go in `programs.system-menu.commonSections`.
 
 ### Capture (Niri)
 
@@ -340,6 +341,34 @@ The default checkout is `~/nix-config`. New files must be Git-tracked for flakes
 to include them. See [the CLI documentation](packages/lsy/README.md) for details.
 `lsy` is not installed on macOS.
 
+### Windows 11 VM
+
+```sh
+lsy windows vm install            # Once, in a terminal: checks, credentials, starts setup
+lsy windows vm console            # Watch the unattended installation at localhost:8006
+lsy windows vm launch             # Fullscreen FreeRDP; closing it shuts Windows down
+lsy windows vm launch --keep-alive
+lsy windows vm status
+lsy windows vm stop
+lsy windows vm remove             # Deletes ~/.windows after typing DELETE WINDOWS
+```
+
+This persistent VM is separate from the disposable `lsy vm`. Dockur runs
+Windows 11 under Docker Compose with 8 GiB RAM, 4 CPUs and an 80 GiB disk by
+default (`install --ram/--cpus/--disk`), without GPU passthrough. The disk lives
+in `~/.windows`; `~/Windows` appears in Windows as `Z:`. The web console and RDP
+listen only on `127.0.0.1`. Docker never restarts the VM itself: `lsy` starts it
+and shuts it down. The container is recreated on every start; nothing
+persistent lives in it.
+
+The Linux workstation profile imports `modules/home/programs/windows-vm.nix`,
+which installs FreeRDP, adds a `Windows 11` application entry for Vicinae, and adds
+a `Windows` section to the system menu. Status and Remove open in Kitty.
+`programs.windows-vm.scale` in the Linux workstation profile sets the Windows
+display scale (175%); set it to `null` to follow the focused monitor.
+Credentials are stored in `~/.config/lsy/windows/credentials.env` (mode 0600),
+never in Git or the Nix store.
+
 ## Add packages
 
 Use the [package scopes](#package-scopes) below to decide where a Home Manager package belongs. Keep the universal base small: CLI essentials go in `modules/home/default.nix`, while toolchains and graphical applications belong in their selected profiles.
@@ -458,7 +487,7 @@ Add a package according to where it should be available:
 | Minimal universal CLI base | `modules/home/default.nix` | Git, `gh`, `lsof`, `jq`, `ripgrep`, `fd`, Linux `usbutils` |
 | Toolchains and development programs | `modules/home/profiles/development.nix` and its program imports | Go/Rust/Node/Python/JVM/C toolchains, `direnv`, Pi, Claude Code, Herdr |
 | Graphical general-use apps | `modules/home/profiles/general-use.nix` | Chrome, Bitwarden, VS Code, Kitty, Vesktop |
-| Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Claude Desktop, Voxtype, Vicinae, Trayscale |
+| Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Claude Desktop, Voxtype, Vicinae, Trayscale, FreeRDP (Windows VM) |
 | Niri profile/program | `modules/home/profiles/niri.nix` and `modules/home/programs/niri.nix` | DMS, Fuzzel, brightnessctl, playerctl, wl-clipboard |
 | Hyprland profile/program | `modules/home/profiles/hyprland.nix` and its program imports | Hyprland settings, bindings, Caelestia, and Noctalia |
 | NixOS gaming | `modules/nixos/gaming.nix` | Steam; future GameMode, Gamescope, or MangoHud additions |

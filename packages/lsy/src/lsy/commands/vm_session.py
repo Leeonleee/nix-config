@@ -30,28 +30,29 @@ def private_directory(path: Path) -> Path:
     return path
 
 
-def runtime_directory() -> Path:
+def runtime_directory(name: str = "lsy-vm") -> Path:
     base = os.environ.get("XDG_RUNTIME_DIR")
     if base:
         parent = Path(base)
         if not parent.is_absolute():
             raise RuntimeError("XDG_RUNTIME_DIR must be absolute")
         private_directory(parent)
-        return private_directory(parent / "lsy-vm")
-    return private_directory(Path(f"/tmp/lsy-vm-{os.getuid()}"))
+        return private_directory(parent / name)
+    return private_directory(Path(f"/tmp/{name}-{os.getuid()}"))
 
 
 @contextlib.contextmanager
-def locked(directory: Path):
-    fd = os.open(directory / "lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+def locked(directory: Path, name: str = "lock", blocking: bool = False,
+           busy: str = "another vm run/stop is in progress; try again later"):
+    fd = os.open(directory / name, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     try:
         info = os.fstat(fd)
         if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o600 or info.st_nlink != 1:
             raise RuntimeError("unsafe VM lock file")
         try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(fd, fcntl.LOCK_EX | (0 if blocking else fcntl.LOCK_NB))
         except BlockingIOError:
-            raise RuntimeError("another vm run/stop is in progress; try again later") from None
+            raise RuntimeError(busy) from None
         yield
     finally:
         os.close(fd)

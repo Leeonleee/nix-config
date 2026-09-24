@@ -19,7 +19,7 @@ let
   # Each entry has either an action or children. Add children at any depth;
   # navigation/dispatch is generated below without eval or label matching.
   # Sessions add their own sections through programs.system-menu.sections,
-  # keyed by XDG_CURRENT_DESKTOP; the NixOS section is shared.
+  # keyed by XDG_CURRENT_DESKTOP; the NixOS section and commonSections are shared.
   nixosSection = {
     label = "NixOS";
     children = [
@@ -34,7 +34,7 @@ let
   };
   menuFor = sections: {
     label = "System";
-    children = [ nixosSection ] ++ sections;
+    children = [ nixosSection ] ++ cfg.commonSections ++ sections;
   };
 
   # Stable IDs are passed as row metadata, independently of labels/filtering.
@@ -113,6 +113,11 @@ in
       type = lib.types.attrsOf (lib.types.listOf lib.types.attrs);
       default = { };
       description = "Menu sections per session, keyed by XDG_CURRENT_DESKTOP.";
+    };
+    commonSections = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      default = [ ];
+      description = "Menu sections shown in every session, after the NixOS section.";
     };
   };
 

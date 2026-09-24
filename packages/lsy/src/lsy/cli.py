@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from lsy.commands import try_package, vm
+from lsy.commands import try_package, vm, windows_vm
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -11,6 +11,7 @@ def main(argv: list[str] | None = None) -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
     try_package.register(subparsers)
     vm.register(subparsers)
+    windows_vm.register(subparsers)
     args = parser.parse_args(argv)
     if sys.platform != "linux":
         print("lsy: only Linux is supported.", file=sys.stderr)
