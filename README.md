@@ -81,8 +81,21 @@ specific host roles:
 There is no universal-apps profile. Chrome and Bitwarden are general-use
 applications, not part of the universal base. Keep platform modules focused on
 OS/user identity differences rather than using them to classify a host.
-Niri configuration remains in one shared program module rather than being
-split into smaller files.
+Shared Niri compositor settings remain in one program module. The Niri profile
+also imports `modules/home/programs/system-menu.nix`: `Mod+Shift+Space` opens a
+Stylix-themed Rofi system menu; `Mod+Space` still opens Vicinae. Escape or
+“Back / close” returns to the parent menu (or closes the root). Rofi also accepts
+`Ctrl+j` / `Ctrl+k` for down/up, `Ctrl+l` for open/run, and `Ctrl+h` for back/close.
+Typing always filters entries; Enter, Escape, arrow keys, and Backspace still
+work normally. Fuzzel remains installed and can be launched manually.
+
+The system menu delegates settings, wallpaper, connectivity, and power actions
+to DMS IPC. NixOS checks/builds/test/switch run in Kitty with output retained;
+rebuilds use `~/nix-config` and the current hostname, like the shell aliases.
+Test/switch may request sudo authentication. DMS settings managed by Nix can
+be reset on rebuild; make persistent changes in `modules/home/programs/dms.nix`.
+To extend the menu, add an entry with `label` and either `action` or nested
+`children` to the `menu` tree in `system-menu.nix`.
 
 ### NixOS system roles
 

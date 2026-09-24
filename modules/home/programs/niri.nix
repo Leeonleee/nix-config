@@ -199,11 +199,6 @@
         action.spawn = [ "vicinae" "toggle" ];
       };
 
-      "Mod+Shift+Space" = {
-        hotkey-overlay.title = "Run an Application: fuzzel";
-        action.spawn = "fuzzel";
-      };
-
       "Super+Alt+L" = {
         hotkey-overlay.title = "Lock the Screen: DMS";
         action.spawn = [
