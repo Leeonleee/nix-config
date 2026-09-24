@@ -24,14 +24,6 @@ let
         id: root
 
         property string currentState: "stopped"
-        readonly property string statusLabel: {
-            switch (currentState) {
-            case "idle": return "Ready";
-            case "recording": return "Recording";
-            case "transcribing": return "Transcribing…";
-            default: return "Stopped";
-            }
-        }
         readonly property string statusIcon: currentState === "recording" ? "mic"
             : currentState === "transcribing" ? "hourglass_top"
             : currentState === "idle" ? "keyboard_voice" : "mic_off"
@@ -69,20 +61,10 @@ let
         }
 
         horizontalBarPill: Component {
-            Row {
-                spacing: Theme.spacingS
-                DankIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: root.statusIcon
-                    color: root.statusColor
-                    size: Theme.iconSize
-                }
-                StyledText {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "Vox: " + root.statusLabel
-                    color: root.statusColor
-                    font.pixelSize: Theme.fontSizeMedium
-                }
+            DankIcon {
+                name: root.statusIcon
+                color: root.statusColor
+                size: Theme.iconSize
             }
         }
 

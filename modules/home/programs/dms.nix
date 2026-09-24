@@ -100,17 +100,17 @@
 
            rightWidgets = [
              {
+               id = "systemTray";
+               enabled = true;
+               trayUseInlineExpansion = true;
+             }
+             {
                id = "voxtypeStatus";
                enabled = true;
              }
              {
                id = "recordingStatus";
                enabled = true;
-             }
-             {
-               id = "systemTray";
-               enabled = true;
-               trayUseInlineExpansion = true;
              }
              {
                id = "clipboard";
