@@ -102,6 +102,13 @@ in
         panel = {
           transparency_mode = "solid";
           shadow = false;
+          # Open panels beside the clicked bar widget instead of at the
+          # bar's centre.
+          open_near_click_control_center = true;
+          open_near_click_launcher = true;
+          open_near_click_clipboard = true;
+          open_near_click_wallpaper = true;
+          open_near_click_session = true;
         };
         # DMS app drawer grid view.
         launcher.app_grid = true;
