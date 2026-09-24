@@ -6,6 +6,7 @@
     ../../modules/nixos
     ../../modules/nixos/workstation.nix
     ../../modules/nixos/niri.nix
+    ../../modules/nixos/hyprland.nix
   ];
 
   networking.hostName = "framework";

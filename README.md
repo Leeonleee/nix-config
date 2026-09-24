@@ -15,8 +15,8 @@ Home Manager; it does not inject Home Manager profiles. Each host's
 
 | Host | NixOS or Darwin roles | Home Manager roles | Host-specific details |
 | --- | --- | --- | --- |
-| `desktop` | baseline, workstation, Niri, gaming, secure boot | development, general-use, Linux workstation, Niri | KDE Plasma and Niri, NVIDIA graphics, and the desktop monitor layout |
-| `framework` | baseline, workstation, Niri | development, general-use, Linux workstation, Niri | Framework laptop, latest Linux kernel, fingerprint support, Btrfs-backed Docker, lid handling, and monitor outputs |
+| `desktop` | baseline, workstation, Niri, Hyprland, gaming, secure boot | development, general-use, Linux workstation, Niri, Hyprland | KDE Plasma, Niri, Hyprland trial, NVIDIA graphics, and the desktop monitor layout |
+| `framework` | baseline, workstation, Niri, Hyprland | development, general-use, Linux workstation, Niri, Hyprland | Framework laptop, latest Linux kernel, fingerprint support, Btrfs-backed Docker, lid handling, and monitor outputs |
 | `dev-nix` | baseline; headless SSH, Docker, and Tailscale host | development | No graphical workstation or Niri role |
 | `mac` | nix-darwin and Homebrew | development, general-use | Apple Silicon macOS with the shared Home Manager base |
 
@@ -45,16 +45,60 @@ NVIDIA configuration remains in the desktop host. Framework laptop behavior,
 lid handling, and monitor outputs remain in Framework host files. The desktop
 and Framework monitor layouts are not shared defaults.
 
+### Hyprland trial alongside Niri
+
+`desktop` and `framework` also offer Hyprland with Caelestia. Rebuild with
+`sudo nixos-rebuild test --flake .#framework` (use `desktop` on the desktop),
+then log out and select **Hyprland** in SDDM's session selector. Do not launch it
+inside an existing Niri session. Select **Niri** at the next login to return;
+Niri/DMS and KDE Plasma remain installed. Once tested, use
+`sudo nixos-rebuild switch --flake .#framework` to keep the configuration.
+
+`modules/nixos/hyprland.nix` only supplies system integration (the session,
+portal, and polkit support). The Home Manager profile
+`modules/home/profiles/hyprland.nix` imports `programs/hyprland.nix` for desktop
+settings and `programs/caelestia.nix` for the shell. Both layers use the stable
+Hyprland package; do not install a separate compositor version in Home Manager.
+Edit those Nix modules and rebuild rather than editing generated files under
+`~/.config/hypr` or installing an upstream dotfiles bundle.
+
+Hyprland has its own tiling/workspace model and keybindings, not Niri's scrolling
+columns. The authoritative bindings are in `modules/home/programs/hyprland.nix`;
+Press **Super+Shift+/** for a searchable, read-only list generated from the
+Hyprland bindings. Terminal, Vicinae, Dolphin, H/J/K/L navigation, workspace
+numbers, media keys and capture shortcuts keep their familiar keys. **Super+P**
+opens Caelestia's dashboard; **Super+Shift+Space** opens its launcher. Niri-only
+column operations and **Super+O** (overview) are intentionally unbound.
+Niri's DMS system menu documented below remains Niri-only; Hyprland screenshots
+use Grimblast instead. Monitor overrides live in each host's `home.nix`: DP-4 remains
+3840×2160 at 160 Hz and scale 1.5, while Framework retains eDP-1 at scale 1.5
+and its dock connector positions. Framework's system lid/suspend policy is
+shared; the explicit Niri output-toggle commands in `hosts/framework/niri.nix`
+are not Hyprland commands.
+
+DMS is bound to `niri.service`, while Caelestia belongs to
+`hyprland-session.target`; rebuilding outside Niri will not start DMS. Fully
+log out between sessions so their services and portal environment are replaced.
+Hyprland uses its own screencast portal and the KDE file chooser, without
+changing Niri's portal selection.
+
+Caelestia uses the existing unstable package set, with no additional flake input.
+Its defaults are retained except for Stylix colours and fonts. Since Stylix has
+no Caelestia target, `modules/home/programs/caelestia.nix` maps the palette to its
+Material colour roles. Home Manager owns `~/.config/caelestia/shell.json` and
+`~/.local/state/caelestia/scheme.json`; change the theme declaratively rather than
+using Caelestia's interactive scheme editor.
+
 ## Repository layout
 
 - `flake.nix` - inputs, native stable/unstable/master package sources, and host composition.
 - `flake.lock` - pins all inputs to exact versions; update it only with an intentional flake update.
 - `hosts/<name>/` - machine identity, generated hardware configuration, host-specific system settings, and Home Manager role selection.
-- `modules/nixos/` - shared baseline, workstation, Niri, gaming, and secure-boot system roles.
+- `modules/nixos/` - shared baseline, workstation, Niri, Hyprland, gaming, and secure-boot system roles.
 - `modules/darwin/` - shared nix-darwin settings.
 - `modules/home/default.nix` - the minimal Home Manager base shared by every host.
 - `modules/home/platforms/` - Linux and macOS identity/platform differences.
-- `modules/home/profiles/` - host-selected Home Manager roles: development, general-use, Linux workstation, and Niri.
+- `modules/home/profiles/` - host-selected Home Manager roles: development, general-use, Linux workstation, Niri, and Hyprland.
 - `modules/home/programs/` - configuration for individual programs used by the base or profiles.
 - `packages/lsy/` - Linux-only lsylabs CLI, packaged and installed through Home Manager.
 - `hosts/lsy-vm/` - standalone disposable NixOS microVM; not a physical host or a `mkHost` configuration.
@@ -81,6 +125,7 @@ specific host roles:
 | General-use | `desktop`, `framework`, and `mac` | Graphical daily applications such as Chrome, Bitwarden, VS Code, Kitty, and Vesktop |
 | Linux workstation | `desktop` and `framework` | Linux-only utilities such as Kate, Voxtype, Vicinae, and Trayscale |
 | Niri | `desktop` and `framework` | Niri/DMS configuration and session utilities such as Fuzzel, brightnessctl, playerctl, and wl-clipboard |
+| Hyprland | `desktop` and `framework` | Trial Hyprland desktop and Caelestia shell |
 | Host-specific | A single host | Hardware-dependent settings, layouts, services, and one-device packages |
 
 There is no universal-apps profile. Chrome and Bitwarden are general-use
@@ -157,6 +202,7 @@ python3 -B -m unittest discover -s modules/home/programs/capture -v
 | Baseline | All Linux hosts | NetworkManager, Docker, Tailscale, user/Zsh setup, locale, and theme |
 | Workstation | `desktop`, `framework` | KDE Plasma/SDDM, Bluetooth, printing, PipeWire, and workstation input support |
 | Niri | `desktop`, `framework` | Niri package/module, `nirinit`, portal selection, application menu, and PAM integration |
+| Hyprland | `desktop`, `framework` | Greeter session, Hyprland portal, and polkit support; desktop settings belong to Home Manager |
 | Gaming | `desktop` | Steam; future GameMode, Gamescope, or MangoHud additions |
 | Secure boot | `desktop` | Lanzaboote and `sbctl` |
 
@@ -343,6 +389,7 @@ Add a package according to where it should be available:
 | Graphical general-use apps | `modules/home/profiles/general-use.nix` | Chrome, Bitwarden, VS Code, Kitty, Vesktop |
 | Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Claude Desktop, Voxtype, Vicinae, Trayscale |
 | Niri profile/program | `modules/home/profiles/niri.nix` and `modules/home/programs/niri.nix` | DMS, Fuzzel, brightnessctl, playerctl, wl-clipboard |
+| Hyprland profile/program | `modules/home/profiles/hyprland.nix` and its program imports | Hyprland settings, bindings, and Caelestia |
 | NixOS gaming | `modules/nixos/gaming.nix` | Steam; future GameMode, Gamescope, or MangoHud additions |
 | Host-only hardware/layout | `hosts/<device>/` | NVIDIA settings, desktop DP-4 layout, Framework lid and monitor outputs |
 | OS-specific user settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |

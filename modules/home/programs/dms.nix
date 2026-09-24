@@ -14,6 +14,7 @@
    programs.dank-material-shell = {
      enable = true;
      systemd.enable = true;
+     systemd.target = "niri.service";
      session.wallpaperPath = "${../../../assets/wallpapers/solar-system-minimal.png}";
      # DMS uses Id::ToolTip title when the title differs from the ID.
      # Hidden items remain accessible through the tray's expansion chevron.
@@ -208,10 +209,13 @@
      };
    };
 
+   # Do not allow activation/manual service starts to launch DMS outside Niri.
+   systemd.user.services.dms.Unit.Requisite = [ "niri.service" ];
+
    # Home Manager replaces settings.json with a new symlink. DMS's file watcher
    # does not reliably notice that replacement, so restart it after changes.
    xdg.configFile."DankMaterialShell/settings.json".onChange = ''
      XDG_RUNTIME_DIR="/run/user/$UID" \
-       ${pkgs.systemd}/bin/systemctl --user restart dms.service || true
+       ${pkgs.systemd}/bin/systemctl --user try-restart dms.service || true
    '';
  }
