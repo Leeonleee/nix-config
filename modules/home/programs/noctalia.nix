@@ -53,13 +53,6 @@ let
     };
   };
   wallpapers = ../../../assets/wallpapers;
-  # Restrained rounding for the bar's widget capsules.
-  capsuleGroup = id: members: {
-    inherit id members;
-    fill = "surface_variant";
-    radius = 6.0;
-    padding = 8.0;
-  };
 in
 {
   # Compositor-independent shell configuration. Session wiring, such as the
@@ -178,44 +171,52 @@ in
         thickness = 38;
         padding = 8;
         widget_spacing = 6;
-        capsule = true;
+        capsule = false;
         capsule_fill = "surface_variant";
         capsule_radius = 6.0;
         capsule_padding = 8.0;
 
-        start = [ "launcher" "workspaces" "media" ];
-        center = [ "group:time" "active_window" ];
-        end = [ "group:tray" "group:status" "control-center" "notifications" ];
-
-        # Related widgets share one capsule; DMS's control center button
-        # likewise groups network, Bluetooth and audio.
-        capsule_group = [
-          (capsuleGroup "time" [ "weather" "clock" ] // { widget_spacing = 12; })
-          (capsuleGroup "tray" [ "tray" "voxtype" "recording" "clipboard" ])
-          (capsuleGroup "status" [ "network" "bluetooth" "volume" "microphone" "battery" ]
-            // { widget_spacing = 15; })
+        # Gaps separate the top widgets now that they have no capsules.
+        start = [ "launcher" "gap" "workspaces" "gap" "media" ];
+        center = [ "weather" "clock" "gap" "control-center" ];
+        end = [
+          "tray"
+          "voxtype"
+          "recording"
+          "clipboard"
+          "gap"
+          "network"
+          "bluetooth"
+          "volume"
+          "microphone"
+          "battery"
+          "gap"
+          "notifications"
         ];
       };
 
       widget = {
+        gap = {
+          type = "spacer";
+          length = 12;
+        };
         # DMS showWorkspaceName; names come from Hyprland's defaultName.
         workspaces = {
           capsule = false;
+          # Bare letters without pills.
+          style = "minimal";
           # Workspace initials; full names do not fit a vertical bar.
           label_source = "name";
           max_label_chars = 1;
           # Larger pills and initials than the defaults (1.0).
           pill_scale = 1.2;
           font_scale = 1.2;
-          # Quieter than the default secondary accent: highlight only the
-          # focused workspace.
+          # Minimal style colours the letters themselves: the focused
+          # workspace is accented, occupied ones are brighter than the empty
+          # ones' on_surface_variant.
           focused_color = "primary";
-          occupied_color = "outline";
+          occupied_color = "on_surface";
           empty_color = "surface_variant";
-        };
-        active_window = {
-          capsule = false;
-          max_length = 320;
         };
         clock = {
           format = "{:%a %d %b  %H:%M}";
