@@ -156,7 +156,7 @@ in
           (capsuleGroup "time" [ "weather" "clock" ])
           (capsuleGroup "tray" [ "tray" "voxtype" "recording" "clipboard" ])
           (capsuleGroup "status" [ "network" "bluetooth" "volume" "microphone" "battery" ]
-            // { widget_spacing = 10; })
+            // { widget_spacing = 15; })
         ];
       };
 
