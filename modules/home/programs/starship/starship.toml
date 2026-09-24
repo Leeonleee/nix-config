@@ -167,5 +167,6 @@ show_milliseconds = true
 format = " in $duration "
 style = "bg:purple"
 disabled = false
-show_notifications = true
-min_time_to_notify = 45000
+# Kitty sends these instead (kitty.nix); Starship repeats them on every
+# prompt redraw, such as a window resize.
+show_notifications = false

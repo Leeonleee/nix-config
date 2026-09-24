@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 let
   cfg = config.desktop.hyprland;
@@ -10,6 +10,7 @@ let
   bind = binding "bindd";
   repeat = binding "binded";
   locked = binding "bindld";
+  mouse = mods: key: description: dispatcher: binding "bindmd" mods key description dispatcher "";
   lockedRepeat = binding "bindeld";
   exec = mods: key: description: command: bind mods key description "exec" command;
 
@@ -73,6 +74,10 @@ let
     (repeat "SUPER SHIFT" "minus" "Decrease window height" "resizeactive" "0 -10%")
     (repeat "SUPER SHIFT" "equal" "Increase window height" "resizeactive" "0 10%")
     (bind "SUPER" "V" "Toggle floating" "togglefloating" "")
+    # Held-button drags: floating windows move freely; tiled ones are dropped
+    # into a new place in the layout.
+    (mouse "SUPER" "mouse:272" "Drag window (left button)" "movewindow")
+    (mouse "SUPER" "mouse:273" "Resize window (right button)" "resizewindow")
     (exec "SUPER SHIFT" "V" "Switch focus between floating and tiling" (lib.getExe focusFloatingOrTiling))
     (bind "SUPER" "W" "Toggle tabbed window group" "togglegroup" "")
     (exec "" "Print" "Screenshot region" "${lib.getExe screenshot} area")
@@ -126,7 +131,9 @@ let
     '';
   };
   bindingSettings = lib.genAttrs (lib.unique (map (b: b.kind) bindings)) (kind:
-    map (b: "${b.mods}, ${b.key}, ${b.description}, ${b.dispatcher}, ${b.argument}")
+    # Mouse binds reject an empty trailing argument.
+    map (b: "${b.mods}, ${b.key}, ${b.description}, ${b.dispatcher}"
+      + lib.optionalString (b.argument != "") ", ${b.argument}")
       (builtins.filter (b: b.kind == kind) bindings)
   );
 in
@@ -187,7 +194,8 @@ in
 
     wayland.windowManager.hyprland = {
       enable = true;
-      package = pkgs.hyprland;
+      # Matches programs.hyprland.package in modules/nixos/hyprland.nix.
+      package = pkgsUnstable.hyprland;
       # Keep described Hyprlang bindings even on HM versions defaulting to Lua.
       configType = "hyprlang";
       xwayland.enable = true;

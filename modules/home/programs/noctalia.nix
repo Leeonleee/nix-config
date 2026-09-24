@@ -183,7 +183,7 @@ in
         # Related widgets share one capsule; DMS's control center button
         # likewise groups network, Bluetooth and audio.
         capsule_group = [
-          (capsuleGroup "time" [ "weather" "clock" ])
+          (capsuleGroup "time" [ "weather" "clock" ] // { widget_spacing = 12; })
           (capsuleGroup "tray" [ "tray" "voxtype" "recording" "clipboard" ])
           (capsuleGroup "status" [ "network" "bluetooth" "volume" "microphone" "battery" ]
             // { widget_spacing = 15; })
@@ -197,6 +197,9 @@ in
           # Workspace initials; full names do not fit a vertical bar.
           label_source = "name";
           max_label_chars = 1;
+          # Larger pills and initials than the defaults (1.0).
+          pill_scale = 1.2;
+          font_scale = 1.2;
           # Quieter than the default secondary accent: highlight only the
           # focused workspace.
           focused_color = "primary";

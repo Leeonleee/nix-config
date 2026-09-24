@@ -10,8 +10,10 @@
     };
 
     settings = {
-
-
+      # Once per command that runs 45s or longer, and only when this window is
+      # not focused. Replaces Starship's cmd_duration notifications, which
+      # re-fire on prompt redraws such as a window resize.
+      notify_on_cmd_finish = "unfocused 45.0";
       update_check_interval = 0;
     };
 
