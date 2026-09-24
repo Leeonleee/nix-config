@@ -4,6 +4,8 @@ let
   tools = {
     niri = lib.getExe config.programs.niri.package;
     recorder = lib.getExe pkgs.gpu-screen-recorder;
+    rofi = lib.getExe config.programs.rofi.finalPackage;
+    pactl = "${pkgs.pulseaudio}/bin/pactl";
     systemctl = "${pkgs.systemd}/bin/systemctl";
     notify = "${pkgs.libnotify}/bin/notify-send";
     slurp = lib.getExe pkgs.slurp;

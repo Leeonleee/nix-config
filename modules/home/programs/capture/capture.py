@@ -21,6 +21,8 @@ import tempfile
 import time
 
 UNIT = "capture-record.service"
+# GSR 5.13.8 src/capture/portal.c; main.cpp propagates this exit code.
+PORTAL_CANCELLED = 60
 
 
 def run(tool, *args, **kwargs):
@@ -64,6 +66,53 @@ def status():
     return {"state": state, "elapsed": elapsed}
 
 
+def choose(prompt, labels):
+    # Return an index, not a label: descriptions can be duplicated or contain
+    # Rofi metadata characters. No custom input or shell interpolation.
+    labels = [" ".join(label.replace("\0", " ").splitlines()) for label in labels]
+    result = subprocess.run(
+        [TOOLS["rofi"], "-dmenu", "-i", "-no-custom", "-format", "i", "-p", prompt],
+        input="\n".join(labels) + "\n", capture_output=True, text=True,
+    )
+    if result.returncode == 1:
+        return None
+    result.check_returncode()
+    index = int(result.stdout.strip())
+    if not 0 <= index < len(labels):
+        raise ValueError("Invalid capture menu selection")
+    return index
+
+
+def select_audio():
+    mode = choose("Recording audio", [
+        "No audio", "System audio", "Microphone", "System audio + microphone",
+    ])
+    if mode is None:
+        return None
+    sources = []
+    if mode in (1, 3):
+        sink = run("pactl", "get-default-sink", capture_output=True, text=True).stdout.strip()
+        if not sink:
+            raise ValueError("No default audio output available")
+        sources.append(sink + ".monitor")
+    if mode in (2, 3):
+        devices = json.loads(run("pactl", "--format=json", "list", "sources",
+                                 capture_output=True, text=True).stdout)
+        microphones = [device for device in devices
+                       if device.get("monitor_of_sink") in (None, 4294967295, "4294967295")
+                       and not device["name"].endswith(".monitor")]
+        if not microphones:
+            raise ValueError("No microphone inputs available")
+        index = choose("Microphone", [
+            f"{device.get('description', device['name'])} ({device['name']})"
+            for device in microphones
+        ])
+        if index is None:
+            return None
+        sources.append(microphones[index]["name"])
+    return sources
+
+
 def record(action):
     if action == "status":
         print(json.dumps(status()))
@@ -71,7 +120,12 @@ def record(action):
     # Serialize the whole decision plus the systemd transaction. Type=exec
     # ensures a successful start is visible before another toggle takes the lock.
     with (runtime() / "control.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+        # Ignore duplicate shortcuts while a chooser or start transaction is
+        # open rather than queueing a second toggle that immediately stops it.
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
         current = status()["state"]
         if current in ("starting", "recording", "stopping"):
             run("systemctl", "--user", "--no-block", "stop", UNIT)
@@ -79,6 +133,11 @@ def record(action):
             # Let the indicator dismiss a failed attempt without starting another.
             run("systemctl", "--user", "reset-failed", UNIT)
         elif action == "toggle":
+            request = runtime() / "audio.json"
+            request.unlink(missing_ok=True)
+            audio = select_audio()
+            if audio is None:
+                return
             # The invoking compositor's environment is authoritative. Do not
             # rely on an old graphical session's socket in the user manager.
             names = [name for name in ("WAYLAND_DISPLAY", "DISPLAY", "NIRI_SOCKET", "XDG_CURRENT_DESKTOP")
@@ -89,7 +148,32 @@ def record(action):
             # one then fails with "Unit not loaded" before start can load it.
             if current == "failed":
                 run("systemctl", "--user", "reset-failed", UNIT)
-            run("systemctl", "--user", "start", UNIT)
+            temporary = request.with_suffix(".tmp")
+            temporary.write_text(json.dumps(audio))
+            temporary.replace(request)
+            try:
+                run("systemctl", "--user", "start", UNIT)
+            except (OSError, subprocess.SubprocessError):
+                request.unlink(missing_ok=True)
+                raise
+
+
+def recording_audio_args():
+    # Consume the per-recording choice once. Direct service starts are silent;
+    # microphone consent never becomes a persistent default.
+    request = runtime() / "audio.json"
+    try:
+        sources = json.loads(request.read_text())
+    except FileNotFoundError:
+        return []
+    finally:
+        request.unlink(missing_ok=True)
+    if not isinstance(sources, list) or len(sources) > 2 or any(
+        not isinstance(source, str) or not source or any(char in source for char in "|\n\0")
+        for source in sources
+    ):
+        raise ValueError("Invalid recording audio sources")
+    return ["-a", "|".join(sources)] if sources else []
 
 
 def worker():
@@ -120,6 +204,7 @@ def worker():
     save()
     output = None
     try:
+        audio_args = recording_audio_args()
         videos = run("videos", "VIDEOS", capture_output=True, text=True).stdout.strip()
         base = Path(videos) if videos and Path(videos).is_absolute() else Path.home() / "Videos"
         # Some user-dirs configurations disable Videos by pointing it at HOME.
@@ -132,7 +217,10 @@ def worker():
         output = Path(name)
         if stopping:
             return 0
-        child = subprocess.Popen([TOOLS["recorder"], "-w", "portal", "-f", "60", "-k", "h264", "-o", str(output)])
+        child = subprocess.Popen([
+            TOOLS["recorder"], "-w", "portal", "-f", "60", "-k", "h264",
+            *audio_args, "-o", str(output),
+        ])
         if stopping and child.poll() is None:
             child.send_signal(signal.SIGINT)
         while child.poll() is None:
@@ -143,11 +231,14 @@ def worker():
                 save()
                 notify("Recording started", str(output))
             time.sleep(0.2)
+        if child.returncode == PORTAL_CANCELLED and data["since"] is None:
+            # Closing the portal chooser is not a recording failure. Returning
+            # success also leaves the DMS indicator idle rather than failed.
+            return 0
         if child.returncode == 0 and output.stat().st_size > 0:
             notify("Recording saved", str(output))
             return 0
         if stopping and data["since"] is None:
-            notify("Recording cancelled")
             return 0
         notify("Recording failed", "See journalctl --user -u " + UNIT, failure=True)
         return 1

@@ -121,8 +121,15 @@ QR region extraction is available from the menu. OCR and QR use a separate
 region selector; cancellation or extraction failure leaves the clipboard alone.
 QR contents are copied, never automatically opened.
 
-Recording prompts for a target through the desktop portal and uses
-GPU Screen Recorder: H.264 MP4, 60 FPS, **no system audio or microphone**.
+Starting a recording first opens an audio menu: **No audio**, **System audio**,
+**Microphone**, or **System audio + microphone**. Microphone modes then prompt
+for an input device; system audio captures the default output selected at start.
+Choosing both mixes them into one audio track. Audio choices are per-recording,
+not remembered; Escape cancels without starting anything. While a recording is
+active, the shortcut/menu stops it immediately without opening another chooser.
+
+Next, the desktop portal prompts for the video target. GPU Screen Recorder
+writes H.264 MP4 at 60 FPS.
 Files go into `Recordings` under the XDG Videos directory (normally
 `~/Videos/Recordings`). Press `Shift+Print` again or click the DMS recording
 indicator to stop and finalize the file. The indicator hides when idle;
