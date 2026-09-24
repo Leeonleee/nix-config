@@ -18,8 +18,22 @@ let
     text = ''
       directory="$HOME/Pictures/Screenshots"
       mkdir -p "$directory"
-      file="$directory/Screenshot-$(date +%Y-%m-%d_%H-%M-%S-%N).png"
+      # Match Niri's screenshot-path naming.
+      file="$directory/Screenshot from $(date '+%Y-%m-%d %H-%M-%S').png"
       grimblast --notify copysave "$1" "$file"
+    '';
+  };
+
+  # Niri's switch-focus-between-floating-and-tiling.
+  focusFloatingOrTiling = pkgs.writeShellApplication {
+    name = "hyprland-focus-floating-or-tiling";
+    runtimeInputs = [ pkgs.jq config.wayland.windowManager.hyprland.finalPackage ];
+    text = ''
+      if hyprctl -j activewindow | jq -e '.floating == true' > /dev/null; then
+        hyprctl dispatch cyclenext tiled
+      else
+        hyprctl dispatch cyclenext floating
+      fi
     '';
   };
 
@@ -35,22 +49,33 @@ let
     (exec "SUPER" "T" "Open Dolphin" "dolphin")
     (locked "SUPER ALT" "S" "Toggle screen reader" "exec" "${pkgs.procps}/bin/pkill orca || exec orca")
     (bind "SUPER" "Q" "Close window" "killactive" "")
-    (bind "SUPER" "U" "Previous workspace" "workspace" "-1")
-    (bind "SUPER" "I" "Next workspace" "workspace" "+1")
-    (bind "SUPER CTRL" "U" "Move window to previous workspace" "movetoworkspace" "-1")
-    (bind "SUPER CTRL" "I" "Move window to next workspace" "movetoworkspace" "+1")
+    # r-/r+ stay on the current monitor and include empty workspaces, like
+    # Niri's per-monitor workspace strip.
+    (bind "SUPER" "U" "Focus workspace up" "workspace" "r-1")
+    (bind "SUPER" "I" "Focus workspace down" "workspace" "r+1")
+    (bind "SUPER CTRL" "U" "Move window to workspace up" "movetoworkspace" "r-1")
+    (bind "SUPER CTRL" "I" "Move window to workspace down" "movetoworkspace" "r+1")
     (bind "SUPER SHIFT CTRL" "Left" "Move workspace to left monitor" "movecurrentworkspacetomonitor" "l")
     (bind "SUPER SHIFT CTRL" "Right" "Move workspace to right monitor" "movecurrentworkspacetomonitor" "r")
-    (bind "SUPER" "F" "Maximize window" "fullscreen" "1")
+    # Column management.
+    (bind "SUPER" "bracketleft" "Consume or expel window left" "layoutmsg" "consume_or_expel prev")
+    (bind "SUPER" "bracketright" "Consume or expel window right" "layoutmsg" "consume_or_expel next")
+    (bind "SUPER" "comma" "Consume window into column" "layoutmsg" "consume")
+    (bind "SUPER" "period" "Expel window from column" "layoutmsg" "promote")
+    (bind "SUPER" "R" "Next preset column width" "layoutmsg" "colresize +conf")
+    (bind "SUPER SHIFT" "R" "Previous preset column width" "layoutmsg" "colresize -conf")
+    (bind "SUPER" "F" "Maximize column" "layoutmsg" "colresize 1.0")
     (bind "SUPER SHIFT" "F" "Fullscreen window" "fullscreen" "0")
+    # Scrolling maximize gives the window its own full-width column.
     (bind "SUPER" "M" "Maximize window" "fullscreen" "1")
+    (bind "SUPER" "C" "Center column" "layoutmsg" "center")
+    (repeat "SUPER" "minus" "Decrease column width" "layoutmsg" "colresize -0.1")
+    (repeat "SUPER" "equal" "Increase column width" "layoutmsg" "colresize +0.1")
+    (repeat "SUPER SHIFT" "minus" "Decrease window height" "resizeactive" "0 -10%")
+    (repeat "SUPER SHIFT" "equal" "Increase window height" "resizeactive" "0 10%")
     (bind "SUPER" "V" "Toggle floating" "togglefloating" "")
-    (bind "SUPER" "W" "Toggle window group (not a Niri column)" "togglegroup" "")
-    (repeat "SUPER" "minus" "Decrease width" "resizeactive" "-10% 0")
-    (repeat "SUPER" "equal" "Increase width" "resizeactive" "10% 0")
-    (repeat "SUPER SHIFT" "minus" "Decrease height" "resizeactive" "0 -10%")
-    (repeat "SUPER SHIFT" "equal" "Increase height" "resizeactive" "0 10%")
-    (bind "SUPER" "C" "Center floating window" "centerwindow" "")
+    (exec "SUPER SHIFT" "V" "Switch focus between floating and tiling" (lib.getExe focusFloatingOrTiling))
+    (bind "SUPER" "W" "Toggle tabbed window group" "togglegroup" "")
     (exec "" "Print" "Screenshot region" "${lib.getExe screenshot} area")
     (exec "CTRL" "Print" "Screenshot focused output" "${lib.getExe screenshot} output")
     (exec "ALT" "Print" "Screenshot active window" "${lib.getExe screenshot} active")
@@ -69,15 +94,16 @@ let
     (lockedRepeat "" "XF86MonBrightnessUp" "Increase brightness" "exec" "${lib.getExe pkgs.brightnessctl} --class=backlight set +10%")
     (lockedRepeat "" "XF86MonBrightnessDown" "Decrease brightness" "exec" "${lib.getExe pkgs.brightnessctl} --class=backlight set 10%-")
   ] ++ lib.concatMap (direction: [
-    (repeat "SUPER" direction.key "Focus ${direction.name}" "movefocus" direction.arg)
-    (repeat "SUPER SHIFT" direction.key "Move window ${direction.name}" "movewindow" direction.arg)
+    (repeat "SUPER" direction.key "Focus ${direction.name}" "layoutmsg" "focus ${direction.arg}")
+    (repeat "SUPER SHIFT" direction.key "Move ${direction.move}" direction.moveDispatcher direction.moveArg)
     (bind "SUPER CTRL" direction.key "Focus monitor ${direction.name}" "focusmonitor" direction.arg)
     (bind "SUPER SHIFT CTRL" direction.key "Move window to monitor ${direction.name}" "movewindow" "mon:${direction.arg}")
   ]) [
-    { key = "H"; name = "left"; arg = "l"; }
-    { key = "J"; name = "down"; arg = "d"; }
-    { key = "K"; name = "up"; arg = "u"; }
-    { key = "L"; name = "right"; arg = "r"; }
+    # Horizontal moves swap whole columns, as Niri's move-column-left/right.
+    { key = "H"; name = "left"; arg = "l"; move = "column left"; moveDispatcher = "layoutmsg"; moveArg = "swapcol l"; }
+    { key = "J"; name = "down"; arg = "d"; move = "window down"; moveDispatcher = "movewindow"; moveArg = "d"; }
+    { key = "K"; name = "up"; arg = "u"; move = "window up"; moveDispatcher = "movewindow"; moveArg = "u"; }
+    { key = "L"; name = "right"; arg = "r"; move = "column right"; moveDispatcher = "layoutmsg"; moveArg = "swapcol r"; }
   ] ++ lib.concatMap (number: let n = toString number; in [
     (bind "SUPER" n "Go to workspace ${n}" "workspace" n)
     (bind "SUPER SHIFT" n "Move window to workspace ${n}" "movetoworkspace" n)
@@ -150,34 +176,77 @@ in
         };
       };
       general = {
-        layout = "dwindle";
+        layout = "scrolling";
+        # gaps_in applies to each window edge, so adjacent windows are 16px
+        # apart, matching Niri's gaps = 16.
         gaps_in = 8;
         gaps_out = 16;
         border_size = 4;
         "col.active_border" = lib.mkForce "rgba(${config.lib.stylix.colors.base0D}cc)";
         "col.inactive_border" = lib.mkForce "rgb(${config.lib.stylix.colors.base03})";
+        # Niri does not wrap or jump to another window at a layout edge.
+        no_focus_fallback = true;
+      };
+      binds.window_direction_monitor_fallback = false;
+      scrolling = {
+        column_width = 0.5;
+        explicit_column_widths = "0.333, 0.5, 0.667";
+        # Niri's center-focused-column = "never": scroll just enough to fit.
+        focus_fit_method = 1; # fit
+        fullscreen_on_one_column = false;
+        # Approximates Niri's focus-follows-mouse max-scroll-amount = "50%".
+        follow_min_visible = 0.5;
+        wrap_focus = false;
+        wrap_swapcol = false;
       };
       decoration = {
         rounding = 0;
         shadow.enabled = false;
       };
-      dwindle.preserve_split = true;
+      # Niri's named workspaces. Workspaces stack vertically, as in Niri.
+      workspace = [
+        "1, defaultName:browser, persistent:true"
+        "2, defaultName:terminal, persistent:true"
+        "3, defaultName:agents, persistent:true"
+        "4, defaultName:code, persistent:true"
+        "5, defaultName:social, persistent:true"
+      ];
+      windowrule = [
+        "float on, match:class firefox$, match:title ^Picture-in-Picture$"
+      ];
+      # Niri-like touchpad: swipe horizontally along columns, vertically
+      # between workspaces.
+      gesture = [
+        "3, horizontal, scrollMove"
+        "3, vertical, workspace"
+      ];
+      # Roughly Niri's default durations (150-250ms) and ease-out curve.
+      bezier = [ "easeOutExpo, 0.16, 1, 0.3, 1" ];
+      animation = [
+        "global, 1, 3, easeOutExpo"
+        "windows, 1, 2.5, easeOutExpo"
+        "windowsIn, 1, 1.5, easeOutExpo, popin 90%"
+        "windowsOut, 1, 1.5, easeOutExpo, popin 90%"
+        "border, 1, 2.5, easeOutExpo"
+        "fade, 1, 1.5, easeOutExpo"
+        "layers, 1, 2, easeOutExpo, fade"
+        "workspaces, 1, 2.5, easeOutExpo, slidevert"
+      ];
       misc = {
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
         mouse_move_enables_dpms = true;
         key_press_enables_dpms = true;
       };
-      # Dwindle is a tree, not Niri's scrolling columns. Column consume/expel,
-      # first/last, preset sizes, workspace reordering and centering visible
-      # columns intentionally have no pretend equivalents. Groups are optional
-      # tabbed windows; directional move bindings move ONE window, not a column.
-      # Niri's floating/tiling focus toggle and shortcut-inhibitor toggle are
-      # also omitted rather than substituting commands with different effects.
+      # Niri actions without a Hyprland equivalent are left unbound rather
+      # than substituted: overview (Super+O), first/last column, move column
+      # to first/last, window height presets, expand column to available
+      # width, center visible columns, workspace reordering and the shortcut
+      # inhibitor toggle. Directional monitor/workspace moves take ONE window,
+      # not a whole column, and Super+F sets full width rather than toggling.
       # Super+Shift+Space opens Caelestia's launcher instead of system-menu:
       # that menu hardcodes DMS and Niri-specific capture operations.
       # Super+P opens the dashboard rather than DMS's control center.
-      # Super+O remains unbound: Caelestia 2.5.0 has no verified overview IPC.
     } // bindingSettings;
   };
 }

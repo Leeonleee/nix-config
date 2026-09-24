@@ -62,19 +62,22 @@ Hyprland package; do not install a separate compositor version in Home Manager.
 Edit those Nix modules and rebuild rather than editing generated files under
 `~/.config/hypr` or installing an upstream dotfiles bundle.
 
-Hyprland has its own tiling/workspace model and keybindings, not Niri's scrolling
-columns. The authoritative bindings are in `modules/home/programs/hyprland.nix`;
-Press **Super+Shift+/** for a searchable, read-only list generated from the
-Hyprland bindings. Terminal, Vicinae, Dolphin, H/J/K/L navigation, workspace
-numbers, media keys and capture shortcuts keep their familiar keys. **Super+P**
-opens Caelestia's dashboard; **Super+Shift+Space** opens its launcher. Niri-only
-column operations and **Super+O** (overview) are intentionally unbound.
-Niri's DMS system menu documented below remains Niri-only; Hyprland screenshots
-use Grimblast instead. Monitor overrides live in each host's `home.nix`: DP-4 remains
-3840×2160 at 160 Hz and scale 1.5, while Framework retains eDP-1 at scale 1.5
-and its dock connector positions. Framework's system lid/suspend policy is
-shared; the explicit Niri output-toggle commands in `hosts/framework/niri.nix`
-are not Hyprland commands.
+Hyprland uses its native scrolling layout, configured to behave like Niri:
+half-width columns by default, the same 1/3, 1/2 and 2/3 presets, no
+centering, 16px gaps, vertically stacked workspaces with the same five named
+persistent workspaces, and Niri-like animation speeds. The authoritative
+bindings are in `modules/home/programs/hyprland.nix`; press **Super+Shift+/**
+for a searchable, read-only list generated from them. Niri's keys map to their
+nearest Hyprland equivalents, including column moves, consume/expel, preset
+widths and centering. **Super+P** opens Caelestia's dashboard;
+**Super+Shift+Space** opens its launcher. Niri actions without an equivalent,
+including **Super+O** (overview), first/last column and window height presets,
+are intentionally unbound. Niri's DMS system menu documented below remains
+Niri-only; Hyprland screenshots use Grimblast instead. Monitor overrides live
+in each host's `home.nix`: DP-4 remains 3840×2160 at 160 Hz and scale 1.5,
+while Framework retains eDP-1 at scale 1.5 and its dock connector positions.
+Framework's Hyprland lid handling, which turns eDP-1 off and on like Niri's,
+lives in `hosts/framework/hyprland.nix`.
 
 DMS is bound to `niri.service`, while Caelestia belongs to
 `hyprland-session.target`; rebuilding outside Niri will not start DMS. Fully

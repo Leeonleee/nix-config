@@ -11,10 +11,12 @@
     ../../modules/home/profiles/hyprland.nix
     ../../modules/home/programs/easyeffects.nix
     ./niri.nix
+    ./hyprland.nix
   ];
 
   wayland.windowManager.hyprland.settings.monitor = [
-    "eDP-1,preferred,auto,1.5"
+    "eDP-1,preferred,0x0,1.5"
+    "DP-2,preferred,1920x0,1.5"
     "DP-9,preferred,auto,1"
     "DP-10,preferred,0x0,1"
     "DP-11,preferred,auto,1"
