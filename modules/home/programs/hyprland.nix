@@ -2,6 +2,7 @@
 
 let
   capture = lib.getExe config.programs.capture.package;
+  caelestiaIpc = "caelestia-shell ipc call";
   # A single source for Hyprland's described bindings and the searchable viewer.
   binding = kind: mods: key: description: dispatcher: argument: {
     inherit kind mods key description dispatcher argument;
@@ -45,7 +46,7 @@ let
     # IPC verified against the Caelestia module's installed 2.5.0 package.
     (exec "SUPER ALT" "L" "Lock screen" "caelestia-shell ipc call lock lock")
     (exec "SUPER" "P" "Toggle Caelestia dashboard" "caelestia-shell ipc call drawers toggle dashboard")
-    (exec "SUPER SHIFT" "space" "Toggle Caelestia launcher" "caelestia-shell ipc call drawers toggle launcher")
+    (exec "SUPER SHIFT" "space" "Open system menu" (lib.getExe config.programs.system-menu.package))
     (exec "SUPER" "T" "Open Dolphin" "dolphin")
     (locked "SUPER ALT" "S" "Toggle screen reader" "exec" "${pkgs.procps}/bin/pkill orca || exec orca")
     (bind "SUPER" "Q" "Close window" "killactive" "")
@@ -133,6 +134,43 @@ let
 in
 {
   home.packages = with pkgs; [ brightnessctl playerctl wl-clipboard fuzzel hyprpicker ];
+
+  # Hyprland equivalents of the Niri system menu's DMS and capture sections.
+  programs.system-menu.sections.Hyprland = [
+    {
+      label = "Capture";
+      children = [
+        {
+          label = "Screenshot";
+          children = [
+            { label = "Region"; action = "${lib.getExe screenshot} area"; }
+            { label = "Window"; action = "${lib.getExe screenshot} active"; }
+            { label = "Screen"; action = "${lib.getExe screenshot} output"; }
+          ];
+        }
+        { label = "Screen recording (toggle)"; action = "${capture} record toggle"; }
+        { label = "OCR region"; action = "${capture} ocr"; }
+        { label = "Colour picker"; action = "${lib.getExe pkgs.hyprpicker} --autocopy"; }
+      ];
+    }
+    {
+      label = "Caelestia";
+      children = [
+        { label = "Dashboard"; action = "${caelestiaIpc} drawers toggle dashboard"; }
+        { label = "Utilities"; action = "${caelestiaIpc} drawers toggle utilities"; }
+        { label = "Sidebar"; action = "${caelestiaIpc} drawers toggle sidebar"; }
+        { label = "App launcher"; action = "${caelestiaIpc} drawers toggle launcher"; }
+      ];
+    }
+    {
+      label = "Power";
+      children = [
+        { label = "Lock screen"; action = "${caelestiaIpc} lock lock"; }
+        # Caelestia's session drawer owns log out, suspend, restart and shut down.
+        { label = "Suspend / restart / shut down / log out"; action = "${caelestiaIpc} drawers toggle session"; }
+      ];
+    }
+  ];
 
   systemd.user.services.hyprland-polkit-agent = {
     Unit = {
@@ -244,8 +282,6 @@ in
       # width, center visible columns, workspace reordering and the shortcut
       # inhibitor toggle. Directional monitor/workspace moves take ONE window,
       # not a whole column, and Super+F sets full width rather than toggling.
-      # Super+Shift+Space opens Caelestia's launcher instead of system-menu:
-      # that menu hardcodes DMS and Niri-specific capture operations.
       # Super+P opens the dashboard rather than DMS's control center.
     } // bindingSettings;
   };
