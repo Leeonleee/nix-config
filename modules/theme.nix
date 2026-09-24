@@ -6,8 +6,8 @@
     # catppuccin-frappe
     # gruvbox-dark-medium.yaml
     # black-metal-venom
-    base16Scheme =
-      "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-material-dark-soft.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
 
     polarity = "dark";
 
