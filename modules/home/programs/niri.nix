@@ -304,22 +304,12 @@
       };
 
       # Focus.
-      "Mod+Left".action.focus-column-left = [];
-      "Mod+Down".action.focus-window-down = [];
-      "Mod+Up".action.focus-window-up = [];
-      "Mod+Right".action.focus-column-right = [];
-
       "Mod+H".action.focus-column-left = [];
       "Mod+J".action.focus-window-down = [];
       "Mod+K".action.focus-window-up = [];
       "Mod+L".action.focus-column-right = [];
 
       # Move windows/columns.
-      "Mod+Shift+Left".action.move-column-left = [];
-      "Mod+Shift+Down".action.move-window-down = [];
-      "Mod+Shift+Up".action.move-window-up = [];
-      "Mod+Shift+Right".action.move-column-right = [];
-
       "Mod+Shift+H".action.move-column-left = [];
       "Mod+Shift+J".action.move-window-down = [];
       "Mod+Shift+K".action.move-window-up = [];
@@ -332,11 +322,6 @@
       "Mod+Ctrl+End".action.move-column-to-last = [];
 
       # Monitor focus.
-      "Mod+Ctrl+Left".action.focus-monitor-left = [];
-      "Mod+Ctrl+Down".action.focus-monitor-down = [];
-      "Mod+Ctrl+Up".action.focus-monitor-up = [];
-      "Mod+Ctrl+Right".action.focus-monitor-right = [];
-
       "Mod+Ctrl+H".action.focus-monitor-left = [];
       "Mod+Ctrl+J".action.focus-monitor-down = [];
       "Mod+Ctrl+K".action.focus-monitor-up = [];
@@ -353,53 +338,14 @@
       "Mod+Shift+Ctrl+Right".action.move-workspace-to-monitor-right = [];
 
       # Workspace navigation.
-      "Mod+Page_Down".action.focus-workspace-down = [];
-      "Mod+Page_Up".action.focus-workspace-up = [];
       "Mod+U".action.focus-workspace-up = [];
       "Mod+I".action.focus-workspace-down = [];
 
-      "Mod+Ctrl+Page_Down".action.move-column-to-workspace-down = [];
-      "Mod+Ctrl+Page_Up".action.move-column-to-workspace-up = [];
-      "Mod+Ctrl+U".action.move-column-to-workspace-down = [];
-      "Mod+Ctrl+I".action.move-column-to-workspace-up = [];
+      "Mod+Ctrl+U".action.move-column-to-workspace-up = [];
+      "Mod+Ctrl+I".action.move-column-to-workspace-down = [];
 
-      "Mod+Shift+Page_Down".action.move-workspace-down = [];
-      "Mod+Shift+Page_Up".action.move-workspace-up = [];
-      "Mod+Shift+U".action.move-workspace-down = [];
-      "Mod+Shift+I".action.move-workspace-up = [];
-
-      # Mouse wheel workspace navigation.
-      "Mod+WheelScrollDown" = {
-        cooldown-ms = 150;
-        action.focus-workspace-down = [];
-      };
-
-      "Mod+WheelScrollUp" = {
-        cooldown-ms = 150;
-        action.focus-workspace-up = [];
-      };
-
-      "Mod+Ctrl+WheelScrollDown" = {
-        cooldown-ms = 150;
-        action.move-column-to-workspace-down = [];
-      };
-
-      "Mod+Ctrl+WheelScrollUp" = {
-        cooldown-ms = 150;
-        action.move-column-to-workspace-up = [];
-      };
-
-      "Mod+WheelScrollRight".action.focus-column-right = [];
-      "Mod+WheelScrollLeft".action.focus-column-left = [];
-
-      "Mod+Ctrl+WheelScrollRight".action.move-column-right = [];
-      "Mod+Ctrl+WheelScrollLeft".action.move-column-left = [];
-
-      "Mod+Shift+WheelScrollDown".action.focus-column-right = [];
-      "Mod+Shift+WheelScrollUp".action.focus-column-left = [];
-
-      "Mod+Ctrl+Shift+WheelScrollDown".action.move-column-right = [];
-      "Mod+Ctrl+Shift+WheelScrollUp".action.move-column-left = [];
+      "Mod+Shift+U".action.move-workspace-up = [];
+      "Mod+Shift+I".action.move-workspace-down = [];
 
       # Direct workspace access.
       "Mod+1".action.focus-workspace = 1;
