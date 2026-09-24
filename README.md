@@ -273,6 +273,31 @@ Recording, Transcribing, or Stopped. Its source is in
 component in the store, and Home Manager installs and enables it.
 After widget-only changes, restart DMS with `systemctl --user restart dms`.
 
+### Dolphin Taildrop sharing
+
+On `desktop` and `framework`, right-click one or more files in Dolphin and
+choose **Send with Taildrop…** (possibly under **Actions**). The picker queries
+Tailscale each time and lists online devices eligible to receive Taildrop files.
+Folders must be compressed into an archive first. Transfers show a start/completion
+notification or an error dialog; the recipient accepts/retrieves files normally.
+
+Set friendly names in `modules/home/profiles/linux-workstation.nix`:
+
+```nix
+services.dolphin-taildrop.nicknames = {
+  "phone-magicdns-name" = "My phone";
+  "ipad-magicdns-name" = "My iPad";
+  "laptop-magicdns-name" = "My laptop";
+};
+```
+
+Use names from `tailscale status` (or Tailscale IPs). Full MagicDNS names without
+trailing dots and hostnames also work. Nicknamed devices sort first; other
+eligible devices remain available below them. Host-specific nicknames can instead
+be declared in `hosts/<name>/home.nix`. After rebuilding, restart Dolphin if the
+action is not visible. Tailscale must be connected and Taildrop allowed for the
+recipient; this action does not change Tailscale permissions or network policy.
+
 ### Declarative web apps
 
 On `desktop` and `framework`, the Linux workstation profile imports
