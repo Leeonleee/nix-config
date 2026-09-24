@@ -1,4 +1,4 @@
-{ ... }:
+{ config, lib, ... }:
 
 {
   # Stylix supplies the Plymouth theme; only enable the boot splash here.
@@ -14,6 +14,26 @@
 
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
+
+  # SDDM otherwise inherits login's fingerprint-first PAM stack, delaying passwords.
+  security.pam.services.sddm = {
+    useDefaultRules = lib.mkForce true;
+    fprintAuth = false;
+    # Preserve session registration and wallet unlocking from the login stack.
+    inherit (config.security.pam.services.login)
+      startSession
+      setLoginUid
+      lastlog
+      enableGnomeKeyring
+      kwallet
+      ;
+    rules = {
+      auth.login.enable = false;
+      account.login.enable = false;
+      password.login.enable = false;
+      session.login.enable = false;
+    };
+  };
   services.desktopManager.plasma6.enable = true;
 
   services.xserver.xkb = {
