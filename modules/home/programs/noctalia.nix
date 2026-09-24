@@ -53,6 +53,13 @@ let
     };
   };
   wallpapers = ../../../assets/wallpapers;
+  # Restrained rounding for the bar's widget capsules.
+  capsuleGroup = id: members: {
+    inherit id members;
+    fill = "surface_variant";
+    radius = 6.0;
+    padding = 8.0;
+  };
 in
 {
   # Compositor-independent shell configuration. Session wiring, such as the
@@ -124,38 +131,59 @@ in
       location.auto_locate = true;
 
       bar.main = {
-        position = "top";
-        # DMS: full-width, square, opaque and without elevation.
+        position = "left";
+        # DMS: full-length, square, opaque and without elevation.
         background_opacity = opacity.desktop;
         radius = 0;
         margin_ends = 0;
         margin_edge = 0;
         shadow = false;
+        thickness = 38;
+        padding = 8;
+        widget_spacing = 6;
+        capsule = true;
+        capsule_fill = "surface_variant";
+        capsule_radius = 6.0;
+        capsule_padding = 8.0;
 
         start = [ "launcher" "workspaces" "media" ];
-        center = [ "weather" "clock" "active_window" ];
-        # DMS's control center button shows network, Bluetooth and audio.
-        end = [
-          "tray"
-          "voxtype"
-          "recording"
-          "clipboard"
-          "network"
-          "bluetooth"
-          "volume"
-          "microphone"
-          "control-center"
-          "battery"
-          "notifications"
+        center = [ "group:time" "active_window" ];
+        end = [ "group:tray" "group:status" "control-center" "notifications" ];
+
+        # Related widgets share one capsule; DMS's control center button
+        # likewise groups network, Bluetooth and audio.
+        capsule_group = [
+          (capsuleGroup "time" [ "weather" "clock" ])
+          (capsuleGroup "tray" [ "tray" "voxtype" "recording" "clipboard" ])
+          (capsuleGroup "status" [ "network" "bluetooth" "volume" "microphone" "battery" ]
+            // { widget_spacing = 10; })
         ];
       };
 
       widget = {
         # DMS showWorkspaceName; names come from Hyprland's defaultName.
         workspaces = {
+          capsule = false;
+          # Workspace initials; full names do not fit a vertical bar.
           label_source = "name";
-          max_label_chars = 12;
+          max_label_chars = 1;
+          # Quieter than the default secondary accent: highlight only the
+          # focused workspace.
+          focused_color = "primary";
+          occupied_color = "outline";
+          empty_color = "surface_variant";
         };
+        active_window = {
+          capsule = false;
+          max_length = 320;
+        };
+        clock = {
+          format = "{:%a %d %b  %H:%M}";
+          vertical_format = "{:%H\n%M}";
+          tooltip_format = "{:%A, %d %B %Y}";
+        };
+        weather.show_condition = false;
+        network.show_label = false;
         # DMS keeps hidden tray items behind an expansion chevron; Noctalia's
         # drawer holds every item that is not pinned.
         tray.drawer = true;
