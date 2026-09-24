@@ -48,6 +48,18 @@ let
           { label = "OCR region"; action = capture [ "ocr" ]; }
           { label = "Colour picker"; action = capture [ "colour" ]; }
           { label = "QR code"; action = capture [ "qr" ]; }
+          {
+            label = "Share latest capture";
+            children = [
+              {
+                label = "Taildrop";
+                action = ''
+                  latest="$(${capture [ "latest" ]})" &&
+                    ${lib.getExe config.services.dolphin-taildrop.package} "$latest"
+                '';
+              }
+            ];
+          }
         ];
       }
       {
@@ -101,7 +113,9 @@ let
       '' else ''
         # Do not hold Rofi's output pipe open while an action is running.
         (
-          if ! ${node.action}; then
+          if ! (
+            ${node.action}
+          ); then
             notify-send --urgency=critical 'System menu' ${lib.escapeShellArg "Failed: ${node.label}"}
           fi
         ) </dev/null >/dev/null 2>&1 &

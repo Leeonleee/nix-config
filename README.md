@@ -121,6 +121,11 @@ QR region extraction is available from the menu. OCR and QR use a separate
 region selector; cancellation or extraction failure leaves the clipboard alone.
 QR contents are copied, never automatically opened.
 
+**Capture → Share latest capture → Taildrop** sends the newest nonempty PNG in
+`~/Pictures/Screenshots` or MP4 in the recording directory (by modification time)
+using the existing Taildrop recipient picker and device nicknames. Stop any
+active recording first so its file is finalized; cancelling the picker sends nothing.
+
 Starting a recording first opens an audio menu: **No audio**, **System audio**,
 **Microphone**, or **System audio + microphone**. Microphone modes then prompt
 for an input device; system audio captures the default output selected at start.

@@ -12,6 +12,12 @@ let
   };
 in
 {
+  options.services.dolphin-taildrop.package = lib.mkOption {
+    type = lib.types.package;
+    readOnly = true;
+    description = "Taildrop sender shared by Dolphin and the capture menu.";
+  };
+
   options.services.dolphin-taildrop.nicknames = lib.mkOption {
     type = lib.types.attrsOf lib.types.str;
     default = { };
@@ -24,6 +30,7 @@ in
   };
 
   config = {
+    services.dolphin-taildrop.package = sender;
     home.packages = [ sender ];
     xdg.dataFile."kio/servicemenus/taildrop.desktop" = {
       executable = true;

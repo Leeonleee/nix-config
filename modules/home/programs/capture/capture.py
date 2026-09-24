@@ -176,6 +176,35 @@ def recording_audio_args():
     return ["-a", "|".join(sources)] if sources else []
 
 
+def recording_directory():
+    videos = run("videos", "VIDEOS", capture_output=True, text=True).stdout.strip()
+    base = Path(videos) if videos and Path(videos).is_absolute() else Path.home() / "Videos"
+    if base == Path.home():
+        base = Path.home() / "Videos"
+    return base / "Recordings"
+
+
+def latest_capture():
+    # Do not send an MP4 before the recorder has finalized its container.
+    if status()["state"] not in ("idle", "failed"):
+        raise ValueError("Stop the recording before sharing a capture")
+    candidates = []
+    for directory, pattern in (
+        (Path.home() / "Pictures" / "Screenshots", "*.png"),
+        (recording_directory(), "*.mp4"),
+    ):
+        for path in directory.glob(pattern):
+            try:
+                stat = path.stat()
+                if path.is_file() and stat.st_size > 0:
+                    candidates.append((stat.st_mtime_ns, str(path)))
+            except FileNotFoundError:
+                continue
+    if not candidates:
+        raise ValueError("No saved screenshots or recordings found")
+    return max(candidates)[1]
+
+
 def worker():
     directory = runtime()
     invocation = os.environ.get("INVOCATION_ID", "")
@@ -205,12 +234,7 @@ def worker():
     output = None
     try:
         audio_args = recording_audio_args()
-        videos = run("videos", "VIDEOS", capture_output=True, text=True).stdout.strip()
-        base = Path(videos) if videos and Path(videos).is_absolute() else Path.home() / "Videos"
-        # Some user-dirs configurations disable Videos by pointing it at HOME.
-        if base == Path.home():
-            base = Path.home() / "Videos"
-        base = base / "Recordings"
+        base = recording_directory()
         base.mkdir(parents=True, exist_ok=True)
         fd, name = tempfile.mkstemp(prefix=time.strftime("Recording-%Y-%m-%d_%H-%M-%S-"), suffix=".mp4", dir=base)
         os.close(fd)
@@ -291,6 +315,8 @@ def main():
     elif len(args) == 2 and args[0] == "screenshot" and args[1] in ("region", "window", "screen"):
         action = {"region": "screenshot", "window": "screenshot-window", "screen": "screenshot-screen"}[args[1]]
         run("niri", "msg", "action", action)
+    elif args == ["latest"]:
+        print(latest_capture())
     elif args in (["ocr"], ["qr"]):
         recognition(args[0])
     elif args == ["colour"]:
@@ -300,7 +326,7 @@ def main():
             clipboard(text)
             notify("Colour copied", text)
     else:
-        print("Usage: capture screenshot region|window|screen | record toggle|stop|status | ocr | colour | qr", file=sys.stderr)
+        print("Usage: capture screenshot region|window|screen | record toggle|stop|status | latest | ocr | colour | qr", file=sys.stderr)
         return 2
     return 0
 

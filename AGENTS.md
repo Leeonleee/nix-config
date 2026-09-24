@@ -140,6 +140,12 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 
 ## CODING STANDARDS
 
+### Commit messages
+
+- Use short, lowercase, plain-language messages describing only what changed, matching the existing history (for example, `added dolphin send with taildrop` or `fixed capture notifications`).
+- Do not use Conventional Commit prefixes or scopes such as `feat:`, `fix:`, or `feat(capture):`.
+- Apply this style to every commit unless the user explicitly requests otherwise.
+
 ### Nix
 
 - Use two-space indentation, semicolon-terminated attributes, and multiline lists for nontrivial values.

@@ -23,6 +23,36 @@ class CaptureTests(unittest.TestCase):
         environment.start()
         self.addCleanup(environment.stop)
 
+    def test_latest_capture_selects_newest_nonempty_file(self):
+        home = Path(self.temporary.name)
+        screenshots = home / "Pictures" / "Screenshots"
+        recordings = home / "Videos" / "Recordings"
+        screenshots.mkdir(parents=True)
+        recordings.mkdir(parents=True)
+        image = screenshots / "Screenshot with spaces.png"
+        video = recordings / "Recording.mp4"
+        image.write_bytes(b"image")
+        video.write_bytes(b"video")
+        (recordings / "empty.mp4").touch()
+        os.utime(image, (100, 100))
+        os.utime(video, (200, 200))
+        with patch.object(backend.Path, "home", return_value=home), \
+                patch.object(backend, "recording_directory", return_value=recordings), \
+                patch.object(backend, "status", return_value={"state": "idle"}):
+            self.assertEqual(backend.latest_capture(), str(video))
+            video.unlink()
+            self.assertEqual(backend.latest_capture(), str(image))
+            image.unlink()
+            with self.assertRaisesRegex(ValueError, "No saved"):
+                backend.latest_capture()
+
+    def test_latest_capture_refuses_unfinished_recording(self):
+        for state in ("starting", "recording", "stopping", "unavailable"):
+            with self.subTest(state=state), \
+                    patch.object(backend, "status", return_value={"state": state}):
+                with self.assertRaisesRegex(ValueError, "Stop the recording"):
+                    backend.latest_capture()
+
     def test_failed_status_query_is_quiet_and_preserves_diagnostics(self):
         error = subprocess.CalledProcessError(1, "systemctl", stderr="Unit temporarily unavailable\n")
         with patch.object(backend.sys, "argv", ["capture", "record", "status"]), \
