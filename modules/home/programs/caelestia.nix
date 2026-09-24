@@ -1,6 +1,82 @@
 { config, lib, pkgs, pkgsUnstable, ... }:
 let
-  shell = pkgsUnstable.caelestia-shell;
+  # Caelestia has no bar plugin API, so add the Voxtype indicator as a
+  # built-in bar entry. The DMS equivalent lives in dms-voxtype.nix.
+  voxtypeWidget = pkgs.writeText "VoxtypeStatus.qml" ''
+    import QtQuick
+    import Quickshell.Io
+    import Caelestia.Config
+    import qs.components
+    import qs.services
+
+    Item {
+        id: root
+
+        property string currentState: "stopped"
+
+        implicitWidth: icon.implicitWidth
+        implicitHeight: icon.implicitHeight
+
+        // Poll the daemon-aware status command rather than trusting a stale state file.
+        Timer {
+            interval: 500
+            running: true
+            repeat: true
+            triggeredOnStart: true
+            onTriggered: {
+                if (!statusProcess.running)
+                    statusProcess.running = true;
+            }
+        }
+
+        Process {
+            id: statusProcess
+
+            command: ["${pkgs.voxtype}/bin/voxtype", "status", "--format", "json"]
+            stdout: StdioCollector {
+                onStreamFinished: {
+                    try {
+                        root.currentState = JSON.parse(text).class || "stopped";
+                    } catch (error) {
+                        root.currentState = "stopped";
+                    }
+                }
+            }
+            onExited: (exitCode, exitStatus) => {
+                if (exitCode !== 0)
+                    root.currentState = "stopped";
+            }
+        }
+
+        MaterialIcon {
+            id: icon
+
+            anchors.centerIn: parent
+            animate: true
+            text: root.currentState === "recording" ? "mic"
+                : root.currentState === "transcribing" ? "hourglass_top"
+                : root.currentState === "idle" ? "keyboard_voice" : "mic_off"
+            color: root.currentState === "recording" ? Colours.palette.m3error
+                : root.currentState === "transcribing" ? Colours.palette.m3primary
+                : Colours.palette.m3onSurfaceVariant
+            fontStyle: Tokens.font.icon.medium
+            fill: root.currentState === "recording" ? 1 : 0
+        }
+    }
+  '';
+  shell = pkgsUnstable.caelestia-shell.overrideAttrs (old: {
+    postPatch = (old.postPatch or "") + ''
+      cp ${voxtypeWidget} modules/bar/components/VoxtypeStatus.qml
+      substituteInPlace modules/bar/Bar.qml \
+        --replace-fail 'roleValue: "clock"' 'roleValue: "voxtype"
+                    delegate: EntryWrapper {
+                        VoxtypeStatus {}
+                    }
+                }
+                DelegateChoice {
+                    roleValue: "clock"'
+    '';
+  });
   colours = config.lib.stylix.colors;
   # Caelestia consumes Material 3 roles, not Base16 or Qt application colours.
   # Keep this bridge local until Stylix provides a Caelestia target.
@@ -58,8 +134,26 @@ in
     };
   };
 
-  # Only override theme settings; all shell behaviour retains upstream defaults.
+  # Only override theme and bar settings; other shell behaviour retains
+  # upstream defaults.
   xdg.configFile."caelestia/shell.json".text = builtins.toJSON {
+    bar = {
+      # Collapse tray icons behind an expansion chevron, matching DMS.
+      tray.compact = true;
+      # Upstream default order, plus the Voxtype indicator beside the tray.
+      entries = map (id: { inherit id; enabled = true; }) [
+        "logo"
+        "workspaces"
+        "spacer"
+        "activeWindow"
+        "spacer"
+        "tray"
+        "voxtype"
+        "clock"
+        "statusIcons"
+        "power"
+      ];
+    };
     appearance.font = {
       headline.family = config.stylix.fonts.sansSerif.name;
       title.family = config.stylix.fonts.sansSerif.name;
