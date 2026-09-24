@@ -8,6 +8,7 @@
     ./programs/neovim
     ./programs/starship
     ./programs/eza.nix
+    ./programs/lsy.nix
   ];
   stylix.targets = {
     starship.enable = false;
