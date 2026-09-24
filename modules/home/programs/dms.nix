@@ -14,7 +14,7 @@
    programs.dank-material-shell = {
      enable = true;
      systemd.enable = true;
-     session.wallpaperPath = "${../../../assets/wallpapers/lavender-cat.png}";
+     session.wallpaperPath = "${../../../assets/wallpapers/solar-system-minimal.png}";
      # DMS uses Id::ToolTip title when the title differs from the ID.
      # Hidden items remain accessible through the tray's expansion chevron.
      session.hiddenTrayIds = [
