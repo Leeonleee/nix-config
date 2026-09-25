@@ -35,6 +35,8 @@
     clang-tools
 
     codecrafters-cli
+    awscli2
+    dig
     terraform
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
