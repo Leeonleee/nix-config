@@ -16,8 +16,34 @@ let
       --option experimental-features 'nix-command flakes'
   '';
 
+  # Generation pages receive the selected number as $1 via "$value".
+  profiles = "/nix/var/nix/profiles";
+  generation = command: ''${terminal command} "$value"'';
+  generations = pkgs.writeShellScript "system-menu-generations" ''
+    current="$(readlink ${profiles}/system)"
+    running="$(readlink -f /run/current-system)"
+    booted="$(readlink -f /run/booted-system)"
+    for link in ${profiles}/system-*-link; do
+      [[ -e "$link" ]] || continue
+      number="''${link##*/system-}"
+      number="''${number%-link}"
+      target="$(readlink -f "$link")"
+      version="$(cat "$link/nixos-version" 2>/dev/null || echo unknown)"
+      date="$(date -d "@$(stat -c %Y "$link")" '+%Y-%m-%d %H:%M')"
+      flags=()
+      [[ "''${link##*/}" == "$current" ]] && flags+=(default)
+      [[ "$target" == "$running" ]] && flags+=(running)
+      [[ "$target" == "$booted" ]] && flags+=(booted)
+      label="$number  ·  $date  ·  $version"
+      (( ''${#flags[@]} )) && label+="  ($(IFS=,; echo "''${flags[*]}" | sed 's/,/, /g'))"
+      printf '%s\t%s\n' "$number" "$label"
+    done | sort -rn
+  '';
+
   # Each entry has either an action or children. Add children at any depth;
   # navigation/dispatch is generated below without eval or label matching.
+  # A dynamic entry lists rows from a script printing "value<TAB>label"; each
+  # row opens its children, whose actions read the selected row as $value.
   # Sessions add their own sections through programs.system-menu.sections,
   # keyed by XDG_CURRENT_DESKTOP; the NixOS section and commonSections are shared.
   nixosSection = {
@@ -30,6 +56,37 @@ let
       { label = "Build configuration"; action = rebuild "build"; }
       { label = "Test configuration (temporary)"; action = rebuild "test"; }
       { label = "Switch configuration"; action = rebuild "switch"; }
+      {
+        label = "Generations";
+        dynamic = {
+          name = "generation";
+          list = generations;
+          children = [
+            {
+              label = "Switch (make default)";
+              action = generation ''
+                sudo ${pkgs.nix}/bin/nix-env --profile ${profiles}/system --switch-generation "$1" &&
+                  sudo ${profiles}/system/bin/switch-to-configuration switch
+              '';
+            }
+            {
+              label = "Test (temporary)";
+              action = generation ''sudo "${profiles}/system-$1-link/bin/switch-to-configuration" test'';
+            }
+            {
+              label = "Boot (next reboot)";
+              action = generation ''
+                sudo ${pkgs.nix}/bin/nix-env --profile ${profiles}/system --switch-generation "$1" &&
+                  sudo ${profiles}/system/bin/switch-to-configuration boot
+              '';
+            }
+            {
+              label = "Show changes from running system";
+              action = generation ''${lib.getExe pkgs.nvd} diff /run/current-system "${profiles}/system-$1-link"'';
+            }
+          ];
+        };
+      }
     ];
   };
   menuFor = sections: {
@@ -39,26 +96,64 @@ let
 
   # Stable IDs are passed as row metadata, independently of labels/filtering.
   # ROFI_DATA records the current page; stripping its last index goes back.
-  renderMenu = id: node: ''
+  # Dynamic rows use "<id>:<value>" pages, so back strips the value instead.
+  pageHeader = data: ''
+    printf '\0data\x1f%s\n' ${data}
+    printf '\0no-custom\x1ftrue\n\0use-hot-keys\x1ftrue\n'
+    printf '\0keep-filter\x1ffalse\n'
+  '';
+  backRow = label: ''
+    printf '%s\0info\x1fback\x1fpermanent\x1ftrue\n' ${lib.escapeShellArg label}
+  '';
+  renderAction = node: ''
+    # Do not hold Rofi's output pipe open while an action is running.
+    (
+      if ! (
+        ${node.action}
+      ); then
+        notify-send --urgency=critical 'System menu' ${lib.escapeShellArg "Failed: ${node.label}"}
+      fi
+    ) </dev/null >/dev/null 2>&1 &
+  '';
+
+  renderMenu = id: node: if node ? dynamic then ''
+    ${id})
+      ${pageHeader (lib.escapeShellArg id)}
+      ${node.dynamic.list} | while IFS=$'\t' read -r value label; do
+        printf '%s\0info\x1f%s\n' "$label" ${lib.escapeShellArg "${id}:"}"$value"
+      done
+      ${backRow "Back"}
+      ;;
+    ${id}:*)
+      selected="''${target#${id}:}"
+      value="''${selected%%_*}"
+      [[ "$value" =~ ^[A-Za-z0-9.-]+$ ]] || exit 0
+      if [[ "$selected" == *_* ]]; then
+        case "''${selected#*_}" in
+          ${lib.concatStringsSep "\n" (lib.imap0 (index: entry: ''
+            ${toString index})
+              ${renderAction entry}
+              ;;
+          '') node.dynamic.children)}
+          *) exit 0 ;;
+        esac
+      else
+        ${pageHeader ''"$target"''}
+        ${lib.concatStringsSep "\n" (lib.imap0 (index: entry: ''
+          printf '%s\0info\x1f%s\n' ${lib.escapeShellArg "${entry.label} — ${node.dynamic.name} "}"$value" "$target"${lib.escapeShellArg "_${toString index}"}
+        '') node.dynamic.children)}
+        ${backRow "Back"}
+      fi
+      ;;
+  '' else ''
     ${id})
       ${if node ? children then ''
-        printf '\0data\x1f%s\n' ${lib.escapeShellArg id}
-        printf '\0no-custom\x1ftrue\n\0use-hot-keys\x1ftrue\n'
-        printf '\0keep-filter\x1ffalse\n'
+        ${pageHeader (lib.escapeShellArg id)}
         ${lib.concatStringsSep "\n" (lib.imap0 (index: entry: ''
           printf '%s\0info\x1f%s\n' ${lib.escapeShellArgs [ entry.label "${id}_${toString index}" ]}
         '') node.children)}
-        printf '%s\0info\x1fback\x1fpermanent\x1ftrue\n' ${lib.escapeShellArg (if id == "root" then "Close" else "Back")}
-      '' else ''
-        # Do not hold Rofi's output pipe open while an action is running.
-        (
-          if ! (
-            ${node.action}
-          ); then
-            notify-send --urgency=critical 'System menu' ${lib.escapeShellArg "Failed: ${node.label}"}
-          fi
-        ) </dev/null >/dev/null 2>&1 &
-      ''}
+        ${backRow (if id == "root" then "Close" else "Back")}
+      '' else renderAction node}
       ;;
     ${lib.optionalString (node ? children) (lib.concatStringsSep "\n" (lib.imap0 (index: entry:
       renderMenu "${id}_${toString index}" entry
@@ -78,7 +173,11 @@ let
       if [[ "$target" == back ]]; then
         current="''${ROFI_DATA:-root}"
         [[ "$current" == root ]] && exit 0
-        target="''${current%_*}"
+        if [[ "$current" == *:* ]]; then
+          target="''${current%%:*}"
+        else
+          target="''${current%_*}"
+        fi
       fi
       case "$target" in
         ${renderMenu "root" (menuFor sections)}

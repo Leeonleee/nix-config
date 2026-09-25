@@ -174,7 +174,8 @@ in
         widget_spacing = 6;
         # A square capsule behind each widget; spacers stay bare.
         capsule = true;
-        capsule_fill = "surface_variant";
+        # Matches the occupied workspace boxes (widget.workspaces.occupied_color).
+        capsule_fill = "outline";
         capsule_radius = 0.0;
         capsule_padding = 8.0;
 

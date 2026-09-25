@@ -431,7 +431,7 @@ in
       "Mod+Shift+E".action.quit = [];
       "Ctrl+Alt+Delete".action.quit = [];
 
-      "Mod+Shift+P".action.power-off-monitors = [];
+      # "Mod+Shift+P".action.power-off-monitors = [];
     };
   };
 }
