@@ -207,6 +207,10 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Switch the Niri shell with `desktop.niri.shell` in
   `modules/home/profiles/niri.nix`, or the Hyprland shell with
   `desktop.hyprland.shell` in `modules/home/profiles/hyprland.nix`.
+- Change the system menu's NixOS section (flake updates, rollback, firmware,
+  garbage collection, generations, rebuilds) in
+  `modules/home/programs/nixos-menu.nix`. Firmware entries rely on
+  `services.fwupd` from `modules/nixos/workstation.nix`.
 - Change shared shell aliases in `modules/home/programs/zsh.nix`.
 - Change the `lsy` CLI in `packages/lsy/`: commands live in
   `src/lsy/commands/` and are registered in `cli.py`; tests in `tests/` run in

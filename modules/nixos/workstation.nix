@@ -43,6 +43,9 @@
 
   services.printing.enable = true;
 
+  # Firmware updates from LVFS, used by the system menu's Firmware entries.
+  services.fwupd.enable = true;
+
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {

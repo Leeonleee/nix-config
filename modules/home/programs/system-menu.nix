@@ -9,36 +9,6 @@ let
     "--hold"
     (pkgs.writeShellScript "system-menu-terminal" command)
   ];
-  checkout = lib.escapeShellArg "${config.home.homeDirectory}/nix-config";
-  rebuild = mode: terminal ''
-    cd ${checkout} && sudo ${lib.getExe pkgs.nixos-rebuild} ${mode} \
-      --flake ".#$(${pkgs.nettools}/bin/hostname)" \
-      --option experimental-features 'nix-command flakes'
-  '';
-
-  # Generation pages receive the selected number as $1 via "$value".
-  profiles = "/nix/var/nix/profiles";
-  generation = command: ''${terminal command} "$value"'';
-  generations = pkgs.writeShellScript "system-menu-generations" ''
-    current="$(readlink ${profiles}/system)"
-    running="$(readlink -f /run/current-system)"
-    booted="$(readlink -f /run/booted-system)"
-    for link in ${profiles}/system-*-link; do
-      [[ -e "$link" ]] || continue
-      number="''${link##*/system-}"
-      number="''${number%-link}"
-      target="$(readlink -f "$link")"
-      version="$(cat "$link/nixos-version" 2>/dev/null || echo unknown)"
-      date="$(date -d "@$(stat -c %Y "$link")" '+%Y-%m-%d %H:%M')"
-      flags=()
-      [[ "''${link##*/}" == "$current" ]] && flags+=(default)
-      [[ "$target" == "$running" ]] && flags+=(running)
-      [[ "$target" == "$booted" ]] && flags+=(booted)
-      label="$number  ·  $date  ·  $version"
-      (( ''${#flags[@]} )) && label+="  ($(IFS=,; echo "''${flags[*]}" | sed 's/,/, /g'))"
-      printf '%s\t%s\n' "$number" "$label"
-    done | sort -rn
-  '';
 
   # Each entry has either an action or children. Add children at any depth;
   # navigation/dispatch is generated below without eval or label matching.
@@ -46,49 +16,7 @@ let
   # row opens its children, whose actions read the selected row as $value.
   # Sessions add their own sections through programs.system-menu.sections,
   # keyed by XDG_CURRENT_DESKTOP; the NixOS section and commonSections are shared.
-  nixosSection = {
-    label = "NixOS";
-    children = [
-      {
-        label = "Check configuration";
-        action = terminal "cd ${checkout} && ${lib.getExe pkgs.nix} --extra-experimental-features 'nix-command flakes' flake check --no-build";
-      }
-      { label = "Build configuration"; action = rebuild "build"; }
-      { label = "Test configuration (temporary)"; action = rebuild "test"; }
-      { label = "Switch configuration"; action = rebuild "switch"; }
-      {
-        label = "Generations";
-        dynamic = {
-          name = "generation";
-          list = generations;
-          children = [
-            {
-              label = "Switch (make default)";
-              action = generation ''
-                sudo ${pkgs.nix}/bin/nix-env --profile ${profiles}/system --switch-generation "$1" &&
-                  sudo ${profiles}/system/bin/switch-to-configuration switch
-              '';
-            }
-            {
-              label = "Test (temporary)";
-              action = generation ''sudo "${profiles}/system-$1-link/bin/switch-to-configuration" test'';
-            }
-            {
-              label = "Boot (next reboot)";
-              action = generation ''
-                sudo ${pkgs.nix}/bin/nix-env --profile ${profiles}/system --switch-generation "$1" &&
-                  sudo ${profiles}/system/bin/switch-to-configuration boot
-              '';
-            }
-            {
-              label = "Show changes from running system";
-              action = generation ''${lib.getExe pkgs.nvd} diff /run/current-system "${profiles}/system-$1-link"'';
-            }
-          ];
-        };
-      }
-    ];
-  };
+  nixosSection = import ./nixos-menu.nix { inherit config lib pkgs terminal; };
   menuFor = sections: {
     label = "System";
     children = [ nixosSection ] ++ cfg.commonSections ++ sections;
