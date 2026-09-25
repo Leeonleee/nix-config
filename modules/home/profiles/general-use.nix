@@ -14,5 +14,6 @@
     # inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.chatgpt
   ];
 
+  programs.cava.enable = true;
   programs.vesktop.enable = true;
 }
