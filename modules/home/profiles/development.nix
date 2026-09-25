@@ -35,6 +35,7 @@
     clang-tools
 
     codecrafters-cli
+    terraform
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.gdb
