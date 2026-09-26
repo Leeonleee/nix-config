@@ -37,6 +37,7 @@
     codecrafters-cli
     awscli2
     dig
+    postgresql
     terraform
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
