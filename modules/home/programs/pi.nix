@@ -117,6 +117,7 @@ in
     enable = true;
 
     package = wrappedPi;
+    context = ./agents/AGENTS.md;
 
     settings = {
       defaultProvider = "openai-codex";

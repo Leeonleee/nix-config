@@ -212,6 +212,9 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
   `modules/home/programs/nixos-menu.nix`. Firmware entries rely on
   `services.fwupd` from `modules/nixos/workstation.nix`.
 - Change shared shell aliases in `modules/home/programs/zsh.nix`.
+- Change the global coding-agent instructions in
+  `modules/home/programs/agents/AGENTS.md`; it is installed as Claude Code's
+  `~/.claude/CLAUDE.md` and Pi's `~/.pi/agent/AGENTS.md`.
 - Change the `lsy` CLI in `packages/lsy/`: commands live in
   `src/lsy/commands/` and are registered in `cli.py`; tests in `tests/` run in
   the package's `checkPhase`. Other Home Manager modules reference the package
@@ -231,7 +234,7 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - `pkgsUnstable` and `pkgsMaster` are imported separately for Linux and Darwin with unfree packages allowed.
 - `modules/home/home-manager-unstable.nix` is a compatibility shim for Pi, Herdr, and Noctalia modules missing from the Home Manager release branch.
 - DMS disables its Stylix target to retain its own theme and restarts its user service when Home Manager replaces `settings.json`.
-- Shared Niri system integration belongs in `modules/nixos/niri.nix`; Framework-specific Niri output names and lid events live in `hosts/framework/niri.nix`, and the desktop monitor layout remains host-specific.
+- Shared Niri system integration belongs in `modules/nixos/niri.nix`; Framework-specific Niri output names live in `hosts/framework/niri.nix`, and the desktop monitor layout remains host-specific.
 - Niri's portal setup deliberately uses the KDE file chooser alongside Dolphin because the default GNOME portal delegates to Nautilus, which is not installed.
 - A successful flake check currently emits a known Stylix warning that the KDE `qt` platform is not supported beyond `qtct`.
 - `lsy windows vm` keeps Windows state only in `~/.windows`; the Compose
