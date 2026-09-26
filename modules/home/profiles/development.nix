@@ -39,6 +39,8 @@
     dig
     postgresql
     terraform
+
+    dua
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.gdb
@@ -52,4 +54,26 @@
     enableZshIntegration = true;
     nix-direnv.enable = true;
   };
+
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.bat.enable = true;
+
+  # tealdeer needs its page cache downloaded before `tldr` works offline.
+  programs.tealdeer = {
+    enable = true;
+    settings.updates.auto_update = true;
+  };
+
+  programs.lazygit.enable = true;
+  programs.lazydocker.enable = true;
+  programs.btop.enable = true;
 }
