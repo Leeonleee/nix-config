@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, pkgsUnstable, ... }:
 
 {
   imports = [
@@ -38,6 +38,12 @@
 
       init.defaultBranch = "main";
     };
+  };
+
+  programs.yazi = {
+    enable = true;
+    package = pkgsUnstable.yazi;
+    enableZshIntegration = true;
   };
 
   programs.home-manager.enable = true;

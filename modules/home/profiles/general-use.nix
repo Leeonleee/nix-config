@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ inputs, pkgs, pkgsUnstable, ... }:
 
 {
   imports = [
@@ -10,6 +10,7 @@
   # host's home.nix if that host should not receive these applications.
   home.packages = with pkgs; [
     bitwarden-desktop
+    pkgsUnstable.code-cursor
     google-chrome
     # inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.chatgpt
   ];
