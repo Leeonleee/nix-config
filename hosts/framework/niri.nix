@@ -40,22 +40,10 @@
       };
     };
 
-    switch-events = {
-      lid-close.action.spawn = [
-        "niri"
-        "msg"
-        "output"
-        "eDP-1"
-        "off"
-      ];
-
-      lid-open.action.spawn = [
-        "niri"
-        "msg"
-        "output"
-        "eDP-1"
-        "on"
-      ];
-    };
+    # No lid switch-events: Niri already turns eDP-1 off on lid close when an
+    # external monitor is connected. Forcing `niri msg output eDP-1 off` also
+    # removed the output while suspended alone, destroying the lock surface so
+    # Niri showed its red locked fallback on lid open until the lock screen
+    # was recreated.
   };
 }

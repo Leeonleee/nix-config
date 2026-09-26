@@ -81,7 +81,7 @@ are intentionally unbound. Niri's DMS system menu documented below remains
 Niri-only; Hyprland screenshots use Grimblast instead. Monitor overrides live
 in each host's `home.nix`: DP-4 remains 3840×2160 at 160 Hz and scale 1.5,
 while Framework retains eDP-1 at scale 1.5 and its dock connector positions.
-Framework's Hyprland lid handling, which turns eDP-1 off and on like Niri's,
+Framework's Hyprland lid handling, which turns eDP-1 off and on (Niri does this natively),
 lives in `hosts/framework/hyprland.nix`.
 
 The selected Niri shell is bound to `niri.service`, while the selected Hyprland
