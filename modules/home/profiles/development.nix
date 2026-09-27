@@ -60,12 +60,19 @@
     enableZshIntegration = true;
   };
 
+  # `cd` falls back to plain directory changes and adds frecency jumps.
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
+    options = [ "--cmd cd" ];
   };
 
   programs.bat.enable = true;
+
+  programs.zsh.shellAliases = {
+    cat = "bat --paging=never";
+    top = "btop";
+  };
 
   # tealdeer needs its page cache downloaded before `tldr` works offline.
   programs.tealdeer = {

@@ -4,12 +4,23 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+
+    defaultKeymap = "viins";
+    # Switch to vi command mode immediately after Esc.
+    localVariables.KEYTIMEOUT = 1;
 
     plugins = [
       {
         name = "zsh-autopair";
         src = pkgs.zsh-autopair;
         file = "share/zsh/zsh-autopair/autopair.zsh";
+      }
+      {
+        name = "you-should-use";
+        src = pkgs.zsh-you-should-use;
+        file = "share/zsh/plugins/you-should-use/you-should-use.plugin.zsh";
       }
     ];
 
