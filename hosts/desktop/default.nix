@@ -5,7 +5,6 @@
     ./hardware-configuration.nix
     ../../modules/nixos
     ../../modules/nixos/workstation.nix
-    ../../modules/nixos/gaming.nix
     ../../modules/nixos/niri.nix
     ../../modules/nixos/hyprland.nix
     ../../modules/nixos/secure-boot.nix

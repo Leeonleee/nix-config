@@ -15,17 +15,15 @@ Home Manager; it does not inject Home Manager profiles. Each host's
 
 | Host | NixOS or Darwin roles | Home Manager roles | Host-specific details |
 | --- | --- | --- | --- |
-| `desktop` | baseline, workstation, Niri, Hyprland, gaming, secure boot | development, general-use, Linux workstation, Niri, Hyprland | KDE Plasma, Niri, Hyprland trial, NVIDIA graphics, and the desktop monitor layout |
+| `desktop` | baseline, workstation, Niri, Hyprland, secure boot | development, general-use, Linux workstation, Niri, Hyprland | KDE Plasma, Niri, Hyprland trial, NVIDIA graphics, and the desktop monitor layout |
 | `framework` | baseline, workstation, Niri, Hyprland | development, general-use, Linux workstation, Niri, Hyprland | Framework laptop, latest Linux kernel, fingerprint support, Btrfs-backed Docker, lid handling, and monitor outputs |
 | `dev-nix` | baseline; headless SSH, Docker, and Tailscale host | development | No graphical workstation or Niri role |
 | `mac` | nix-darwin and Homebrew | development, general-use | Apple Silicon macOS with the shared Home Manager base |
 
 The Linux baseline provides NetworkManager, Docker, Tailscale, Zsh,
 Australian locale settings, and the shared Stylix theme from `modules/theme.nix`. The
-workstation role adds the shared graphical stack for `desktop` and `framework`.
-The separate gaming role currently owns Steam for `desktop`; future gaming
-additions such as GameMode, Gamescope, or MangoHud belong there as well. Secure
-boot is also desktop-specific.
+workstation role adds the shared graphical stack, including Steam, for `desktop`
+and `framework`. Secure boot is desktop-specific.
 
 DMS follows Stylix through its built-in target while retaining its configured
 wallpaper. Herdr uses custom color tokens generated from the Stylix palette.
@@ -165,7 +163,7 @@ settings.
 - `flake.nix` - inputs, native stable/unstable/master package sources, and host composition.
 - `flake.lock` - pins all inputs to exact versions; update it only with an intentional flake update.
 - `hosts/<name>/` - machine identity, generated hardware configuration, host-specific system settings, and Home Manager role selection.
-- `modules/nixos/` - shared baseline, workstation, Niri, Hyprland, gaming, and secure-boot system roles.
+- `modules/nixos/` - shared baseline, workstation, Niri, Hyprland, and secure-boot system roles.
 - `modules/darwin/` - shared nix-darwin settings.
 - `modules/home/default.nix` - the minimal Home Manager base shared by every host.
 - `modules/home/platforms/` - Linux and macOS identity/platform differences.
@@ -272,10 +270,9 @@ python3 -B -m unittest discover -s modules/home/programs/capture -v
 | Role | Hosts | Examples |
 | --- | --- | --- |
 | Baseline | All Linux hosts | NetworkManager, Docker, Tailscale, user/Zsh setup, locale, and theme |
-| Workstation | `desktop`, `framework` | KDE Plasma/SDDM, Bluetooth, printing, PipeWire, and workstation input support |
+| Workstation | `desktop`, `framework` | KDE Plasma/SDDM, Bluetooth, printing, PipeWire, Steam, and workstation input support |
 | Niri | `desktop`, `framework` | Niri package/module, `nirinit`, portal selection, application menu, and PAM integration |
 | Hyprland | `desktop`, `framework` | Greeter session, Hyprland portal, and polkit support; desktop settings belong to Home Manager |
-| Gaming | `desktop` | Steam; future GameMode, Gamescope, or MangoHud additions |
 | Secure boot | `desktop` | Lanzaboote and `sbctl` |
 
 Place host hardware and topology in the host instead of a shared role:
@@ -490,7 +487,6 @@ Add a package according to where it should be available:
 | Linux utility workstation | `modules/home/profiles/linux-workstation.nix` | Kate, Claude Desktop, Voxtype, Vicinae, Trayscale, FreeRDP (Windows VM) |
 | Niri profile/program | `modules/home/profiles/niri.nix` and `modules/home/programs/niri.nix` | DMS, Fuzzel, brightnessctl, playerctl, wl-clipboard |
 | Hyprland profile/program | `modules/home/profiles/hyprland.nix` and its program imports | Hyprland settings, bindings, Caelestia, and Noctalia |
-| NixOS gaming | `modules/nixos/gaming.nix` | Steam; future GameMode, Gamescope, or MangoHud additions |
 | Host-only hardware/layout | `hosts/<device>/` | NVIDIA settings, desktop DP-4 layout, Framework lid and monitor outputs |
 | OS-specific user settings | `modules/home/platforms/linux.nix` or `macos.nix` | User and home-directory differences |
 | One device only | `hosts/<device>/home.nix` | Packages needed on only that machine |

@@ -12,16 +12,15 @@ Configured hosts and roles:
 
 | Flake output | System roles | Home Manager roles | Purpose |
 | --- | --- | --- | --- |
-| `nixosConfigurations.desktop` | baseline, workstation, Niri, gaming, secure boot | development, general-use, Linux workstation, Niri | KDE Plasma/Niri desktop with NVIDIA graphics |
+| `nixosConfigurations.desktop` | baseline, workstation, Niri, secure boot | development, general-use, Linux workstation, Niri | KDE Plasma/Niri desktop with NVIDIA graphics |
 | `nixosConfigurations.framework` | baseline, workstation, Niri | development, general-use, Linux workstation, Niri | Framework laptop with KDE Plasma/Niri, DMS, fingerprint support, and Btrfs Docker storage |
 | `nixosConfigurations.dev-nix` | baseline; headless SSH, Docker, and Tailscale | development | Headless development server |
 | `darwinConfigurations.mac` | nix-darwin and Homebrew | development, general-use | Apple Silicon macOS |
 
 The baseline NixOS module supplies NetworkManager, Docker, Tailscale, Zsh,
-Australian locale settings, and the Stylix theme. Workstation is shared by
-`desktop` and `framework`. Niri system integration is shared by those two
-hosts. Gaming currently enables Steam on `desktop`; future GameMode, Gamescope,
-or MangoHud additions belong in the gaming role. Secure boot is desktop-only.
+Australian locale settings, and the Stylix theme. Workstation, including Steam,
+is shared by `desktop` and `framework`. Niri system integration is shared by
+those two hosts. Secure boot is desktop-only.
 
 Home Manager has a deliberately small universal base: Git, Zsh, Neovim,
 Starship, Eza, fastfetch, the theme, and baseline CLI tools. Development is a
@@ -42,7 +41,7 @@ and Bitwarden belong to general-use.
 │   ├── dev-nix/                      # Headless server identity, SSH, and Home Manager config
 │   └── mac/                          # macOS user, state version, and Home Manager config
 └── modules/
-    ├── nixos/                        # Baseline, workstation, Niri, gaming, and secure-boot roles
+    ├── nixos/                        # Baseline, workstation, Niri, and secure-boot roles
     ├── darwin/                       # Shared macOS system and Homebrew settings
     └── home/
         ├── default.nix               # Minimal universal Home Manager base
@@ -107,8 +106,6 @@ Role boundaries:
   upstream Niri and `nirinit` modules, applies the Niri overlay, enables
   `nirinit`, and contains shared portal, application-menu, and Dankshell PAM
   configuration.
-- `modules/nixos/gaming.nix`: desktop gaming role; currently Steam. Future
-  GameMode, Gamescope, or MangoHud additions belong here.
 - `modules/nixos/secure-boot.nix`: desktop Lanzaboote and `sbctl` support.
 
 Keep NVIDIA drivers/settings in `hosts/desktop/default.nix`. Keep Framework
@@ -176,8 +173,8 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Add Linux workstation utilities to `modules/home/profiles/linux-workstation.nix`.
 - Add Niri session programs/settings to the Niri profile/program modules;
   split large program files only when it improves navigation.
-- Add Steam and future GameMode/Gamescope/MangoHud system integration to
-  `modules/nixos/gaming.nix`.
+- Add Steam and other gaming system integration to
+  `modules/nixos/workstation.nix`.
 - Keep NVIDIA and monitor layouts in the relevant host files.
 
 ### Lua and TOML
@@ -197,7 +194,7 @@ The current macOS `rebuild-test` alias contains `#$mac` rather than `#mac`, so u
 - Add Linux graphical user applications in `modules/home/profiles/linux-workstation.nix`.
 - Change shared Niri Home Manager layout, input, rules, or keybindings in `modules/home/programs/niri.nix`; change Framework-specific outputs and lid handling in `hosts/framework/niri.nix`.
 - Change shared NixOS Niri integration in `modules/nixos/niri.nix`; retain NVIDIA desktop settings in `hosts/desktop/default.nix`.
-- Add or change desktop gaming system packages in `modules/nixos/gaming.nix`.
+- Add or change gaming system packages in `modules/nixos/workstation.nix`.
 - Change the global NixOS Stylix scheme or font in `modules/theme.nix`.
 - Change DMS settings in `modules/home/programs/dms.nix`.
 - Change Noctalia settings in `modules/home/programs/noctalia.nix`; its session
