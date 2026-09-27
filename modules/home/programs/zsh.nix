@@ -5,6 +5,14 @@
     enable = true;
     enableCompletion = true;
 
+    plugins = [
+      {
+        name = "zsh-autopair";
+        src = pkgs.zsh-autopair;
+        file = "share/zsh/zsh-autopair/autopair.zsh";
+      }
+    ];
+
     initContent = ''
     if [[ -x /opt/homebrew/bin/brew ]]; then
       eval "$(/opt/homebrew/bin/brew shellenv)"
