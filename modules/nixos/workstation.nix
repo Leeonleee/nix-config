@@ -61,6 +61,12 @@
     "uinput"
   ];
 
+  # Launchers index applications once at startup, so packages from a system
+  # switch stay hidden until they restart. This runs as each user on switch.
+  system.userActivationScripts.restartLaunchers = ''
+    ${config.systemd.package}/bin/systemctl --user try-restart vicinae.service noctalia.service 2>/dev/null || true
+  '';
+
   programs.firefox.enable = true;
 
   # The NixOS module also enables the 32-bit graphics stack Steam requires.
