@@ -36,6 +36,11 @@
   };
   services.desktopManager.plasma6.enable = true;
 
+  # Electron apps use native Wayland so they scale correctly on HiDPI outputs.
+  # A session variable also reaches the systemd user manager, which launchers
+  # use to start apps; compositor-level environment settings do not.
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
   services.xserver.xkb = {
     layout = "us";
     variant = "";

@@ -31,9 +31,6 @@ in
   };
 
   programs.niri.settings = {
-    # Electron apps such as VS Code use native Wayland.
-    environment."NIXOS_OZONE_WL" = "1";
-
     # Support applications that require XWayland.
     # Use an absolute path because xwayland-satellite is not otherwise on PATH.
     xwayland-satellite = {

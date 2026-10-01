@@ -217,7 +217,6 @@ in
       # niri.service in its own module, not graphical-session.target (which
       # both compositors legitimately use).
       settings = {
-        env = [ "NIXOS_OZONE_WL,1" ];
         # HM only restarts the session targets at login. Stop them on exit so
         # Restart= services such as Vicinae and EasyEffects do not crash-loop
         # without a display until the next login, each crash spawning DrKonqi.
