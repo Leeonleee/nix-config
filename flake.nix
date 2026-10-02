@@ -25,10 +25,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
+    # Not following our nixpkgs: packages build against upstream's pin so they
+    # come from the numtide cache.
+    llm-agents.url = "github:numtide/llm-agents.nix";
 
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";

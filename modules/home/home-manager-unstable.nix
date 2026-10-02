@@ -6,6 +6,6 @@
   imports = [
     "${inputs.home-manager-unstable}/modules/programs/pi-coding-agent.nix"
     "${inputs.home-manager-unstable}/modules/programs/herdr.nix"
-    "${inputs.home-manager-unstable}/modules/programs/noctalia.nix"
+    "${inputs.home-manager-unstable}/modules/programs/noctalia"
   ];
 }
