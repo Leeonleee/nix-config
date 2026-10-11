@@ -12,6 +12,7 @@
     bitwarden-desktop
     pkgsUnstable.code-cursor
     google-chrome
+    moonlight-qt
     pkgsUnstable.postman
     # inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.chatgpt
   ];
