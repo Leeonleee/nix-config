@@ -254,7 +254,7 @@ in
           # Niri's center-focused-column = "never": scroll just enough to fit.
           focus_fit_method = 1; # fit
           fullscreen_on_one_column = false;
-          # Approximates Niri's focus-follows-mouse max-scroll-amount = "50%".
+          # Focus follows the mouse only onto columns at least half visible.
           follow_min_visible = 0.5;
           wrap_focus = false;
           wrap_swapcol = false;
