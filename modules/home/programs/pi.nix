@@ -130,12 +130,17 @@ in
       ];
 
       packages = [
+
+        "npm:@juicesharp/rpiv-ask-user-question" # ask user questions
+        "npm:pi-web-access" # allow agent to access web
+        "npm:pi-subagents"
+        "npm:pi-lens" # allow agent to see errors/warnings in code
+        "npm:@juicesharp/rpiv-todo" # show progress of agent work
+        "npm:@narumitw/pi-plan-mode" # plan mode
+
         "npm:pi-init"
-        "npm:@tintinweb/pi-subagents"
         "npm:pi-btw"
         "npm:pi-clear-screen"
-        "npm:pi-simplify"
-        "npm:@narumitw/pi-plan-mode"
       ];
     };
   };
