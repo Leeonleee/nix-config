@@ -39,7 +39,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager-unstable = {
-      url = "github:nix-community/home-manager";
+      # Pinned: later Herdr modules need lib.hm.generators.mkImpureConfigCleanup,
+      # which release-26.05 lacks. Unpin once the release branch has it.
+      url = "github:nix-community/home-manager/dfadbe5162d5e86bc0808badec8f346f81b4b3f0";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
