@@ -25,6 +25,10 @@
     };
   };
 
+  # nirinit restores the saved session whenever it starts, so a rebuild that
+  # restarts it relaunches every saved window. Updates apply at next login.
+  systemd.user.services.nirinit.restartIfChanged = false;
+
   # Niri's default GNOME portal delegates its file chooser to Nautilus, which
   # is not installed. Use the KDE file chooser alongside Dolphin instead.
   xdg.mime.defaultApplications."inode/directory" = "org.kde.dolphin.desktop";
