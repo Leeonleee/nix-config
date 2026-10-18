@@ -141,6 +141,8 @@ in
         "npm:pi-init"
         "npm:pi-btw"
         "npm:pi-clear-screen"
+
+        "npm:pi-claude-bridge" # Claude subscription models via Claude Code
       ];
     };
   };
