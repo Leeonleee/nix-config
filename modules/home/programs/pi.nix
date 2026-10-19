@@ -133,7 +133,7 @@ in
 
         "npm:@juicesharp/rpiv-ask-user-question" # ask user questions
         "npm:pi-web-access" # allow agent to access web
-        "npm:pi-subagents"
+        "npm:@tintinweb/pi-subagents"
         "npm:pi-lens" # allow agent to see errors/warnings in code
         "npm:@juicesharp/rpiv-todo" # show progress of agent work
         "npm:@narumitw/pi-plan-mode" # plan mode
