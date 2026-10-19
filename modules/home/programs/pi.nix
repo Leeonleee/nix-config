@@ -120,9 +120,9 @@ in
     context = ./agents/AGENTS.md;
 
     settings = {
-      defaultProvider = "openai-codex";
+      defaultProvider = "claude-bridge";
       defaultThinkingLevel = "medium";
-      defaultModel = "gpt-6-astra";
+      defaultModel = "claude-opus-5-5";
       theme = stylixTheme.name;
 
       skills = [
