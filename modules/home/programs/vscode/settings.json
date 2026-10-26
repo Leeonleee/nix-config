@@ -55,7 +55,7 @@
     {"name": "pdflatex ➞ bibtex ➞ pdflatex`×2", "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"]},
     {"name": "xelatex ➞ bibtex ➞ xelatex`×2", "tools": ["xelatex", "bibtex", "xelatex", "xelatex"]}
   ],
-  "vim.vimrc.enable": true,
+  "vim.vimrc.enable": false,
   "extensions.experimental.affinity": {"asvetliakov.vscode-neovim": 1},
   "workbench.secondarySideBar.defaultVisibility": "hidden",
   "typescript.updateImportsOnFileMove.enabled": "always",
