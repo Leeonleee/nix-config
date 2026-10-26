@@ -138,6 +138,8 @@ in
         "npm:@juicesharp/rpiv-todo" # show progress of agent work
         "npm:@narumitw/pi-plan-mode" # plan mode
 
+        "npm:pi-claude-code-ui"
+
         "npm:pi-init"
         "npm:pi-btw"
         "npm:pi-clear-screen"
