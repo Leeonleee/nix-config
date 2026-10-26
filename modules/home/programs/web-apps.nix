@@ -7,6 +7,11 @@ let
       url = "https://chatgpt.com";
       icon = ./web-apps/icons/chatgpt.svg;
     };
+    x = {
+      name = "X";
+      url = "https://x.com";
+      icon = ./web-apps/icons/x.svg;
+    };
     youtube = {
       name = "YouTube";
       url = "https://youtube.com";
