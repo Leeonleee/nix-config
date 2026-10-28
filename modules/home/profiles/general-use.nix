@@ -14,6 +14,7 @@
     google-chrome
     moonlight-qt
     pkgsUnstable.postman
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.grok-bot
     # inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.chatgpt
   ];
 
