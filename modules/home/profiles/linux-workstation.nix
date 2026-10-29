@@ -23,6 +23,7 @@
 
   home.packages = with pkgs; [
     kdePackages.kate
+    qbittorrent
     inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop
   ];
 }
