@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 {
   programs.vscode = {
     enable = true;
+    # nixos-26.05 vscode 1.144.0 fails in patchPhase (stale @vscode/ripgrep path); unstable has the fix.
+    package = pkgsUnstable.vscode;
     # Keep existing Marketplace extensions and allow installing more in VS Code.
     mutableExtensionsDir = true;
 
