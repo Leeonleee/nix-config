@@ -1,4 +1,4 @@
-{ lib, pkgs, pkgsUnstable, ... }:
+{ inputs, lib, pkgs, pkgsUnstable, ... }:
 
 {
   imports = [
@@ -22,6 +22,7 @@
       jq
       ripgrep
       fd
+      inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr-core
     ]
     ++ lib.optionals stdenv.isLinux [
       usbutils
