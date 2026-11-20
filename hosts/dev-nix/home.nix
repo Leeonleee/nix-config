@@ -5,6 +5,7 @@
 
   imports = [
     ../../modules/home/profiles/development.nix
+    ./hermes.nix
   ];
 
   # Keep this host headless by adding only dev-nix-specific packages here.
