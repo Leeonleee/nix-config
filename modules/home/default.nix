@@ -9,6 +9,7 @@
     ./programs/starship
     ./programs/eza.nix
     ./programs/lsy.nix
+    ./programs/herdr-core.nix
   ];
   stylix.targets = {
     gtk.enable = false;
@@ -22,7 +23,6 @@
       jq
       ripgrep
       fd
-      inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr-core
     ]
     ++ lib.optionals stdenv.isLinux [
       usbutils

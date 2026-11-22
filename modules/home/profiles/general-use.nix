@@ -4,6 +4,7 @@
   imports = [
     ../programs/kitty.nix
     ../programs/vscode
+    ../programs/herdr-app
   ];
 
   # Daily-use applications for graphical hosts. Remove this profile from a
@@ -15,7 +16,6 @@
     moonlight-qt
     pkgsUnstable.postman
     inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.grok-bot
-    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr-app
     # inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.chatgpt
   ];
 

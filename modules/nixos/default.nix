@@ -50,6 +50,8 @@
       "kvm" # Allow lsy vm run without sudo.
     ];
     shell = pkgs.zsh;
+    # Keeps user services such as herdr-core running without a login session.
+    linger = true;
   };
 
   programs.zsh.enable = true;

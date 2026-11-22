@@ -37,9 +37,6 @@
     ];
   };
 
-  # Keeps the Hermes user services running without a login session.
-  users.users.leonl.linger = true;
-
   environment.enableAllTerminfo = true;
 
   users.users.leonl.openssh.authorizedKeys.keys = [
