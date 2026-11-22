@@ -47,7 +47,7 @@ let
   ] ++ cfg.shellBindings ++ [
     (exec "SUPER SHIFT" "space" "Open system menu" (lib.getExe config.programs.system-menu.package))
     (exec "SUPER" "T" "Open Dolphin" "dolphin")
-    (locked "SUPER ALT" "S" "Toggle screen reader" "exec" "${pkgs.procps}/bin/pkill orca || exec orca")
+    (locked "SUPER ALT" "S" "Toggle screen reader" "exec" "${pkgs.procps}/bin/pkill -x .orca-wrapped || exec ${pkgs.orca}/bin/orca")
     (bind "SUPER" "Q" "Close window" "killactive" "")
     # r-/r+ stay on the current monitor and include empty workspaces, like
     # Niri's per-monitor workspace strip.

@@ -211,7 +211,9 @@ in
       "Super+Alt+S" = {
         allow-when-locked = true;
         hotkey-overlay.hidden = true;
-        action.spawn-sh = "pkill orca || exec orca";
+        # Match the screen reader's wrapper process exactly; the Orca ADE also
+        # ships an `orca` command and runs as orca-ide.
+        action.spawn-sh = "${pkgs.procps}/bin/pkill -x .orca-wrapped || exec ${pkgs.orca}/bin/orca";
       };
 
       # Volume.
